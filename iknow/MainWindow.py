@@ -7,6 +7,7 @@ from PySide import QtCore
 
 from ui.Ui_MainWindow import Ui_MainWindow
 from NewTagDialog import NewTagDialog
+from NewKnowledgeDialog import NewKnowledgeDialog
 from tagModel import TagModel
 from tagParentsModel import TagParentsModel
 from knowledgeModel import KnowledgeModel
@@ -47,6 +48,7 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.tagTreeWidget.currentItemChanged.connect(self.tagChanged)
         self.ui.newTagButton.clicked.connect(self.showNewTagButtonDialog)
         self.ui.updateTagsButton.clicked.connect(self.updateTagWidget)
+        self.ui.newKnowledgeButton.clicked.connect(self.showNewKnowledgeDialog)
 
     def updateTagWidget(self):
         # Insert root tags
@@ -62,6 +64,12 @@ class MainWindow(QtGui.QMainWindow):
         newTagDlg = NewTagDialog(self, self.tagModel, self.tagParentsModel, parentID=self.currentTag)
         newTagDlg.exec_()
         self.updateTagWidget()
+
+    def showNewKnowledgeDialog(self):
+        logging.debug("Show NewKnowledgeDialog")
+        newKnowledgeDlg = NewKnowledgeDialog(self, self.tagModel, self.tagParentsModel, self.knowledgeModel, parentID=self.currentTag)
+        newKnowledgeDlg.exec_()
+        self.knowledgeModel.setFilterByTagID(self.currentTag)
 
     def tagChanged(self, current, previous):
         self.currentTag = int(current.text(1))
