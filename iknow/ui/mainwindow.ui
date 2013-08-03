@@ -75,16 +75,16 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QPushButton" name="newTagButton">
+            <widget class="QPushButton" name="expandAllTagsButton">
              <property name="text">
-              <string>New Tag</string>
+              <string>Expand all</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QPushButton" name="updateTagsButton">
+            <widget class="QPushButton" name="collapseAllTagsButton">
              <property name="text">
-              <string>Update Tags</string>
+              <string>Collapse all</string>
              </property>
             </widget>
            </item>
@@ -126,5 +126,38 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>expandAllTagsButton</sender>
+   <signal>clicked()</signal>
+   <receiver>tagTreeWidget</receiver>
+   <slot>expandAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>91</x>
+     <y>581</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>156</x>
+     <y>320</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>collapseAllTagsButton</sender>
+   <signal>clicked()</signal>
+   <receiver>tagTreeWidget</receiver>
+   <slot>collapseAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>222</x>
+     <y>581</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>156</x>
+     <y>320</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
