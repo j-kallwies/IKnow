@@ -1,0 +1,2 @@
+#!/usr/bin/bash
+pyside-uic iknow/ui/mainwindow.ui > iknow/ui/Ui_MainWindow.py
