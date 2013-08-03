@@ -3,10 +3,12 @@
 import logging
 
 from PySide import QtGui
+from PySide import QtCore
 
 from ui.Ui_MainWindow import Ui_MainWindow
 from tagModel import TagModel
 from tagParentsModel import TagParentsModel
+from knowledgeModel import KnowledgeModel
 from databaseConnection import DatabaseConnection
 
 class MainWindow(QtGui.QMainWindow):
@@ -15,6 +17,8 @@ class MainWindow(QtGui.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        self.setWindowTitle("IKnow")
+
         # DB-Connection
         self.dbConnection = DatabaseConnection()
         if self.dbConnection.connect():
@@ -22,27 +26,36 @@ class MainWindow(QtGui.QMainWindow):
         else:
             logging.error("Failed to connect to the database")
 
-        #Create Models
+        # Create Models
         self.tagModel = TagModel(self.dbConnection.db)
-        self.ui.tableView.setModel(self.tagModel)
         self.tagParentsModel = TagParentsModel(self.dbConnection.db)
-        self.ui.tableView_2.setModel(self.tagParentsModel)
+        self.knowledgeModel = KnowledgeModel(self.dbConnection.db)
 
+        # Setup views
+        self.ui.knowledgeTableView.setModel(self.knowledgeModel)
+        self.ui.knowledgeTableView.hideColumn(0)
+        self.ui.knowledgeTableView.setColumnWidth(1, 600)
+        self.ui.knowledgeTableView.setColumnWidth(2, 700)
+
+        # Insert root tags
         rootTags = self.getRootTags()
-
-        print(rootTags)
-
         self.ui.tagTreeWidget.clear()
         for rootID in sorted(rootTags.keys(), reverse=True):
-            elem = QtGui.QTreeWidgetItem([str(rootID), rootTags[rootID]])
-            self.ui.tagTreeWidget.insertTopLevelItem(0, elem)
+            newElem = QtGui.QTreeWidgetItem([rootTags[rootID], str(rootID)])
+            self.ui.tagTreeWidget.insertTopLevelItem(0, newElem)
+            self.insertChildTags(rootID, newElem)
 
         self.tagParentsModel.setFilter("")
         self.tagParentsModel.select()
 
-        print("Children of Ingw.: "+str(self.getChildTags(28)))
+        self.ui.tagTreeWidget.currentItemChanged.connect(self.tagChanged)
 
-        self.setWindowTitle("IKnow")
+    def tagChanged(self, current, previous):
+        self.currentTag = int(current.text(1))
+        self.knowledgeModel.setFilterByTagID(self.currentTag)
+
+        logging.debug("currentTag = %d", self.currentTag)
+
 
     def getRootTags(self):
         rootTags = {}
@@ -60,13 +73,17 @@ class MainWindow(QtGui.QMainWindow):
             return self.tagModel.record(0).value("name")
 
     def insertChildTags(self, ID, treeWidgetItem):
-        self.tagParentsModel.getChildList(ID)
+        childTags = self.getChildTags(ID)
+        logging.debug(self.getTagNameFromID(ID) + ": " + str(childTags))
+        for childID in childTags.keys():
+            newElem = QtGui.QTreeWidgetItem(treeWidgetItem, [self.getTagNameFromID(childID), str(childID)])
+            if self.hasChildTags(childID):
+                self.insertChildTags(childID, newElem)
 
     def getChildTags(self, ID):
         childTags = {}
         self.tagParentsModel.setFilter("parentTagID = %d" % ID)
         self.tagParentsModel.select()
-        print("tagParentsModel.count()=%d" % self.tagParentsModel.rowCount())
         for i in range(self.tagParentsModel.rowCount()):
             ID = self.tagParentsModel.record(i).value("tagID")
             childTags[ID] = self.getTagNameFromID(ID)
