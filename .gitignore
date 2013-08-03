@@ -1,0 +1,10 @@
+*.pyc
+IKnow.config
+IKnow.creator
+IKnow.creator.user
+IKnow.files
+IKnow.includes
+iknow/ui/Ui_*.py
+*.sqlite
+.cache
+.coverage
