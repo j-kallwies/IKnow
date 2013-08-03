@@ -8,3 +8,12 @@ class TagParentsModel(QtSql.QSqlRelationalTableModel):
         self.setTable("tag_parents")
         self.select()
         logging.debug("%d rows in TagParentsModel" % self.rowCount())
+
+    def addParentTag(self, tagID, parentTagID):
+        record = QtSql.QSqlRecord()
+        record.append(QtSql.QSqlField("ID"))
+        record.append(QtSql.QSqlField("tagID"))
+        record.append(QtSql.QSqlField("parentTagID"))
+        record.setValue(1, tagID)
+        record.setValue(2, parentTagID)
+        return self.insertRecord(self.rowCount()-1, record)

@@ -6,6 +6,7 @@ from PySide import QtGui
 from PySide import QtCore
 
 from ui.Ui_MainWindow import Ui_MainWindow
+from NewTagDialog import NewTagDialog
 from tagModel import TagModel
 from tagParentsModel import TagParentsModel
 from knowledgeModel import KnowledgeModel
@@ -37,6 +38,17 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.knowledgeTableView.setColumnWidth(1, 600)
         self.ui.knowledgeTableView.setColumnWidth(2, 700)
 
+        # Load tags
+        self.updateTagWidget()
+
+        self.currentTag = None
+
+        # Connect signals and slots
+        self.ui.tagTreeWidget.currentItemChanged.connect(self.tagChanged)
+        self.ui.newTagButton.clicked.connect(self.showNewTagButtonDialog)
+        self.ui.updateTagsButton.clicked.connect(self.updateTagWidget)
+
+    def updateTagWidget(self):
         # Insert root tags
         rootTags = self.getRootTags()
         self.ui.tagTreeWidget.clear()
@@ -45,10 +57,11 @@ class MainWindow(QtGui.QMainWindow):
             self.ui.tagTreeWidget.insertTopLevelItem(0, newElem)
             self.insertChildTags(rootID, newElem)
 
-        self.tagParentsModel.setFilter("")
-        self.tagParentsModel.select()
-
-        self.ui.tagTreeWidget.currentItemChanged.connect(self.tagChanged)
+    def showNewTagButtonDialog(self):
+        logging.debug("Show NewTagDialog")
+        newTagDlg = NewTagDialog(self, self.tagModel, self.tagParentsModel, parentID=self.currentTag)
+        newTagDlg.exec_()
+        self.updateTagWidget()
 
     def tagChanged(self, current, previous):
         self.currentTag = int(current.text(1))
@@ -56,8 +69,11 @@ class MainWindow(QtGui.QMainWindow):
 
         logging.debug("currentTag = %d", self.currentTag)
 
-
     def getRootTags(self):
+        self.tagModel.setFilter("")
+        self.tagModel.select()
+        self.tagParentsModel.setFilter("")
+        self.tagParentsModel.select()
         rootTags = {}
         for i in range(self.tagModel.rowCount()):
             ID = self.tagModel.record(i).value("ID")
@@ -66,19 +82,17 @@ class MainWindow(QtGui.QMainWindow):
                 rootTags[ID] = tag
         return rootTags
 
-    def getTagNameFromID(self, ID):
-        self.tagModel.setFilter("ID=%d" % ID)
-        self.tagModel.select()
-        if self.tagModel.rowCount() == 1:
-            return self.tagModel.record(0).value("name")
-
     def insertChildTags(self, ID, treeWidgetItem):
+        if not self.tagModel.hasID(ID):
+            return
+
         childTags = self.getChildTags(ID)
-        logging.debug(self.getTagNameFromID(ID) + ": " + str(childTags))
+        logging.debug(self.tagModel.getTagNameFromID(ID) + ": " + str(childTags))
         for childID in childTags.keys():
-            newElem = QtGui.QTreeWidgetItem(treeWidgetItem, [self.getTagNameFromID(childID), str(childID)])
-            if self.hasChildTags(childID):
-                self.insertChildTags(childID, newElem)
+            if self.tagModel.hasID(childID):
+                newElem = QtGui.QTreeWidgetItem(treeWidgetItem, [self.tagModel.getTagNameFromID(childID), str(childID)])
+                if self.hasChildTags(childID):
+                    self.insertChildTags(childID, newElem)
 
     def getChildTags(self, ID):
         childTags = {}
@@ -86,7 +100,7 @@ class MainWindow(QtGui.QMainWindow):
         self.tagParentsModel.select()
         for i in range(self.tagParentsModel.rowCount()):
             ID = self.tagParentsModel.record(i).value("tagID")
-            childTags[ID] = self.getTagNameFromID(ID)
+            childTags[ID] = self.tagModel.getTagNameFromID(ID)
         return childTags
 
     def hasChildTags(self, ID):

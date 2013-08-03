@@ -26,61 +26,63 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QTreeWidget" name="tagTreeWidget">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <column>
-           <property name="text">
-            <string>Tag</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>ID</string>
-           </property>
-           <property name="font">
-            <font>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-          </column>
-          <item>
-           <property name="text">
-            <string>Elektrotechnik</string>
-           </property>
-           <property name="text">
-            <string>1</string>
-           </property>
-           <item>
-            <property name="text">
-             <string>Nachrichtentechnik</string>
-            </property>
-            <property name="text">
-             <string>2</string>
-            </property>
-            <item>
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="2" column="0">
+            <widget class="QPushButton" name="newTagButton">
              <property name="text">
-              <string>Nachrichtenübertragung</string>
+              <string>New Tag</string>
              </property>
-             <property name="text">
-              <string>3</string>
-             </property>
-            </item>
+            </widget>
            </item>
-          </item>
-          <item>
-           <property name="text">
-            <string>Informatik</string>
-           </property>
-           <property name="text">
-            <string>4</string>
-           </property>
-          </item>
+           <item row="2" column="1">
+            <widget class="QPushButton" name="updateTagsButton">
+             <property name="text">
+              <string>Update Tags</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="2">
+            <widget class="QTreeWidget" name="tagTreeWidget">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <column>
+              <property name="text">
+               <string>Tag</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>ID</string>
+              </property>
+              <property name="font">
+               <font>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+             </column>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="newTagButton">
+             <property name="text">
+              <string>New Tag</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QPushButton" name="updateTagsButton">
+             <property name="text">
+              <string>Update Tags</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>

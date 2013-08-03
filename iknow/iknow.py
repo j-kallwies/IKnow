@@ -6,6 +6,7 @@ import logging
 from PySide import QtGui
 
 from MainWindow import MainWindow
+#from NewTagDialog import NewTagDialog
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
