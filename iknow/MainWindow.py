@@ -39,6 +39,9 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.knowledgeTableView.setColumnWidth(1, 600)
         self.ui.knowledgeTableView.setColumnWidth(2, 700)
 
+        self.ui.tagTreeWidget.setColumnWidth(0, 300)
+        self.ui.tagTreeWidget.setColumnWidth(1, 30)
+
         # Load tags
         self.updateTagWidget()
 
