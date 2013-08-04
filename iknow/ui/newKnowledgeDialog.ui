@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>766</width>
-    <height>338</height>
+    <height>404</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -111,63 +111,34 @@
         <property name="title">
          <string>Tags</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="1">
-          <widget class="QPushButton" name="addTagButton">
-           <property name="text">
-            <string>Add Tag</string>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QTreeWidget" name="tagTreeWidget">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="3">
-          <widget class="QLabel" name="parentTagLabel">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="removeTagButton">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>Remove Tag(s)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QSpinBox" name="newTagSpinBox">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="3">
-          <widget class="QTableWidget" name="assignedTagsList">
-           <property name="editTriggers">
-            <set>QAbstractItemView::NoEditTriggers</set>
-           </property>
-           <property name="alternatingRowColors">
-            <bool>true</bool>
-           </property>
-           <property name="selectionMode">
-            <enum>QAbstractItemView::ExtendedSelection</enum>
-           </property>
-           <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectRows</enum>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
            </property>
            <column>
             <property name="text">
-             <string>ID</string>
+             <string>Tag</string>
             </property>
            </column>
            <column>
             <property name="text">
-             <string>Tag</string>
+             <string>ID</string>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
             </property>
            </column>
           </widget>

@@ -18,18 +18,18 @@ class NewKnowledgeDialog(QtGui.QDialog):
         self.tagParentsModel = tagParentsModel
         self.knowledgeModel = knowledgeModel
 
-
-        self.ui.assignedTagsList.setColumnWidth(0, 35)
-        self.ui.assignedTagsList.setColumnWidth(1, 240)
+        self.ui.tagTreeWidget.setColumnWidth(0, 250)
+        self.ui.tagTreeWidget.setColumnWidth(1, 20)
 
         if editRow is None:
             self.setWindowTitle("Add new piece of knowledge")
             self.ui.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
             self.ui.buttonBox.accepted.connect(self.addNewKnowledge)
             if parentID is not None:
-                self.ui.newTagSpinBox.setValue(parentID)
-                self.updateParentTagName(parentID)
-                self.addTagFromSpinbox()
+                tagIDs = set({parentID})
+            else:
+                tagIDs = set()
+            self.tagModel.fillTreeWidgetWithTags(self.ui.tagTreeWidget, checkable=True, IDstoCheck=tagIDs)
         else:
             self.setWindowTitle("Edit a piece of knowledge")
             self.ui.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel | QtGui.QDialogButtonBox.Apply | QtGui.QDialogButtonBox.Reset)
@@ -41,16 +41,28 @@ class NewKnowledgeDialog(QtGui.QDialog):
             logging.debug("self.knowledgeID=%d" % self.knowledgeID)
             self.editRow = editRow
             self.resetDataFromModel()
-
-        self.ui.newTagSpinBox.valueChanged.connect(self.updateParentTagName)
         self.ui.buttonBox.rejected.connect(self.close)
-        self.ui.addTagButton.clicked.connect(self.addTagFromSpinbox)
-        self.ui.removeTagButton.clicked.connect(self.removeTag)
 
-        #self.ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).setEnabled(False)
+    def getSelectedTagIDs(self):
+        logging.debug("topLevelItemCount()=%d" % self.ui.tagTreeWidget.topLevelItemCount())
+        tagIDs = []
+        for i in range(self.ui.tagTreeWidget.topLevelItemCount()):
+            rootItem = self.ui.tagTreeWidget.topLevelItem(i)
+            if rootItem.checkState(0) == QtCore.Qt.CheckState.Checked:
+                tagIDs.append(int(rootItem.data(1, 0)))
+            tagIDs.extend(self.getSelectedTagIDsFromChilds(rootItem))
+        return tagIDs
+
+    def getSelectedTagIDsFromChilds(self, treeWidgetItem):
+        tagIDs = []
+        for i in range(treeWidgetItem.childCount()):
+            childItem = treeWidgetItem.child(i)
+            if childItem.checkState(0) == QtCore.Qt.CheckState.Checked:
+                tagIDs.append(int(childItem.data(1, 0)))
+            tagIDs.extend(self.getSelectedTagIDsFromChilds(childItem))
+        return tagIDs
 
     def resetDataFromModel(self):
-        self.clearTags()
         self.addTagsFromModel()
 
         title = self.knowledgeModel.record(self.editRow).value("title")
@@ -62,49 +74,28 @@ class NewKnowledgeDialog(QtGui.QDialog):
         logging.debug("updateModel")
         title = self.ui.tagNameEdit.text()
         description = self.ui.plainTextEdit.toPlainText()
-        newTagIDs = [int(self.ui.assignedTagsList.item(i,0).data(0)) for i in range(self.ui.assignedTagsList.rowCount())]
+        newTagIDs = self.getSelectedTagIDs()
         self.knowledgeModel.updateKnowledge(self.editRow, title, description, newTagIDs)
 
     def updateModelAndClose(self):
         self.updateModel()
         self.close()
 
-    def clearTags(self):
-        while self.ui.assignedTagsList.rowCount() > 0:
-            self.ui.assignedTagsList.removeRow(0)
-
     def addTagsFromModel(self):
         tagIDs = self.knowledgeModel.getTagIDsFromKnowledgeID(self.knowledgeID)
-        logging.debug("getTagIDsFromKnowledgeID=%s" % str(tagIDs))
-        for tagID in tagIDs:
-            self.addTag(tagID)
-
-    def addTag(self, newTagID):
-        newTagName = self.tagModel.getTagNameFromID(newTagID)
-        row = self.ui.assignedTagsList.rowCount()
-        self.ui.assignedTagsList.insertRow(row)
-        self.ui.assignedTagsList.setItem(row, 0, QtGui.QTableWidgetItem(str(newTagID)))
-        self.ui.assignedTagsList.setItem(row, 1, QtGui.QTableWidgetItem(newTagName))
-
-    def addTagFromSpinbox(self):
-        newTagID = self.ui.newTagSpinBox.value()
-        self.addTag(newTagID)
-
-    def removeTag(self):
-        linesToRemove = {}
-        for selectedItem in self.ui.assignedTagsList.selectedItems():
-            linesToRemove[selectedItem.row()] = True
-        for row in sorted(linesToRemove.keys(), reverse=True):
-            self.ui.assignedTagsList.removeRow(row)
+        print(tagIDs)
+        self.tagModel.fillTreeWidgetWithTags(self.ui.tagTreeWidget, checkable=True, IDstoCheck=tagIDs)
 
     def addNewKnowledge(self):
+        logging.debug("addNewKnowledge()")
         if self.ui.tagNameEdit.text() == "":
             return
         title = self.ui.tagNameEdit.text()
         description = self.ui.plainTextEdit.toPlainText()
         newKnowledgeID = self.knowledgeModel.addNewKnowledge(title, description)
-        for i in range(self.ui.assignedTagsList.rowCount()):
-            tagID = int(self.ui.assignedTagsList.item(i,0).data(0))
+        tagIDs = self.getSelectedTagIDs()
+        logging.debug("getSelectedTagIDs()=%s" % str(tagIDs))
+        for tagID in tagIDs:
             self.knowledgeModel.addTagForKnowledge(newKnowledgeID, tagID)
         self.close()
 
