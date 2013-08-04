@@ -58,6 +58,8 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.updateTagsButton.clicked.connect(self.updateTagWidget)
         self.ui.newKnowledgeButton.clicked.connect(self.showNewKnowledgeDialog)
 
+        self.ui.knowledgeTableView.doubleClicked.connect(self.showEditKnowledgeDialog)
+
     def removeSelectedTag(self):
         selectedItem = self.ui.tagTreeWidget.selectedItems()[0]
         IDtoRemove = int(selectedItem.text(1))
@@ -83,6 +85,13 @@ class MainWindow(QtGui.QMainWindow):
     def showNewKnowledgeDialog(self):
         logging.debug("Show NewKnowledgeDialog")
         newKnowledgeDlg = NewKnowledgeDialog(self, self.tagModel, self.tagParentsModel, self.knowledgeModel, parentID=self.currentTag)
+        newKnowledgeDlg.exec_()
+        self.knowledgeModel.setFilterByTagID(self.currentTag)
+
+    def showEditKnowledgeDialog(self, modelIndex):
+        logging.debug("Show EditKnowledgeDialog")
+        logging.debug("Row=%d" % modelIndex.row())
+        newKnowledgeDlg = NewKnowledgeDialog(self, self.tagModel, self.tagParentsModel, self.knowledgeModel, editRow=modelIndex.row())
         newKnowledgeDlg.exec_()
         self.knowledgeModel.setFilterByTagID(self.currentTag)
 
