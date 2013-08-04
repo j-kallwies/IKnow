@@ -34,6 +34,13 @@ class TagModel(QtSql.QSqlRelationalTableModel):
 
         return newID
 
+    def removeTag(self, ID):
+        self.setFilter("ID=%d" % ID)
+        self.select()
+        logging.debug("removeTag: self.rowCount()=%d" % self.rowCount())
+        if self.rowCount() == 1:
+            self.removeRow(0)
+
     def getTagNameFromID(self, ID):
         self.setFilter("ID=%d" % ID)
         self.select()

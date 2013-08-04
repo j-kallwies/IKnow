@@ -47,11 +47,23 @@ class MainWindow(QtGui.QMainWindow):
 
         self.currentTag = None
 
+        # Create menus
+        act = QtGui.QAction("Remove selected Tag", self, statusTip="Remove the selected Tag. The child Tags are not touched.", triggered=self.removeSelectedTag)
+        self.ui.tagTreeWidget.addAction(act)
+        self.ui.tagTreeWidget.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
+
         # Connect signals and slots
         self.ui.tagTreeWidget.currentItemChanged.connect(self.tagChanged)
         self.ui.newTagButton.clicked.connect(self.showNewTagButtonDialog)
         self.ui.updateTagsButton.clicked.connect(self.updateTagWidget)
         self.ui.newKnowledgeButton.clicked.connect(self.showNewKnowledgeDialog)
+
+    def removeSelectedTag(self):
+        selectedItem = self.ui.tagTreeWidget.selectedItems()[0]
+        IDtoRemove = int(selectedItem.text(1))
+        logging.debug("Remove selected Tag (ID=%d)." % IDtoRemove)
+        self.tagModel.removeTag(IDtoRemove)
+        self.updateTagWidget()
 
     def updateTagWidget(self):
         # Insert root tags
