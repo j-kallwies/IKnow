@@ -83,6 +83,12 @@
             </property>
             <item>
              <widget class="QPlainTextEdit" name="plainTextEdit">
+              <property name="font">
+               <font>
+                <family>Terminus</family>
+                <stylestrategy>PreferAntialias</stylestrategy>
+               </font>
+              </property>
               <property name="plainText">
                <string/>
               </property>
