@@ -1,4 +1,7 @@
 #!/bin/bash
-pyside-uic iknow/ui/mainwindow.ui > iknow/ui/Ui_MainWindow.py
-pyside-uic iknow/ui/newTagDialog.ui > iknow/ui/Ui_NewTagDialog.py
-pyside-uic iknow/ui/newKnowledgeDialog.ui > iknow/ui/Ui_NewKnowledgeDialog.py
+for uifile in iknow/ui/*.ui
+do
+    uifilename="${uifile##*/}"
+    echo -e "$uifile > iknow/ui/Ui_${uifilename%.[^.]*}.py"
+    pyside-uic "$uifile" > "iknow/ui/Ui_${uifilename%.[^.]*}.py"
+done
