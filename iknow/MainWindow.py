@@ -56,6 +56,8 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.updateTagsButton.clicked.connect(self.updateTagWidget)
         self.ui.newKnowledgeButton.clicked.connect(self.showNewKnowledgeDialog)
 
+        self.ui.filterTagsEdit.textChanged.connect(self.updateTagWidget)
+
         self.ui.knowledgeTableView.doubleClicked.connect(self.showEditKnowledgeDialog)
 
     def removeSelectedTag(self):
@@ -66,7 +68,25 @@ class MainWindow(QtGui.QMainWindow):
         self.updateTagWidget()
 
     def updateTagWidget(self):
-        self.tagModel.fillTreeWidgetWithTags(self.ui.tagTreeWidget)
+        logging.debug("filter-Edit=%s" % self.ui.filterTagsEdit.text())
+        filter = self.ui.filterTagsEdit.text()
+        if filter == "":
+            filterIDs = None
+        else:
+            foundIDs = self.tagModel.getIDsFilteredByName(filter)
+            logging.debug("foundIDs=" + str(foundIDs))
+            filterIDs = []
+            filterIDs.extend(foundIDs)
+            for ID in foundIDs:
+                logging.debug("foundIDs=%s" % str(foundIDs))
+                filterIDs.extend(self.tagModel.getParentIDs(ID))
+                filterIDs.extend(self.tagModel.getAllChildIDs(ID))
+            filterIDs = set(filterIDs)
+            logging.debug("filterIDs=" + str(filterIDs))
+        self.tagModel.fillTreeWidgetWithTags(self.ui.tagTreeWidget, filterIDs=filterIDs)
+
+        if self.ui.filterTagsEdit.text() is not "":
+            self.ui.tagTreeWidget.expandAll()
 
     def showNewTagButtonDialog(self):
         logging.debug("Show NewTagDialog")

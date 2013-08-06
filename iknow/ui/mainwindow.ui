@@ -46,7 +46,14 @@
            </size>
           </property>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0" colspan="2">
+           <item row="3" column="0">
+            <widget class="QPushButton" name="expandAllTagsButton">
+             <property name="text">
+              <string>Expand all</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="2">
             <widget class="QTreeWidget" name="tagTreeWidget">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -77,31 +84,38 @@
              </column>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QPushButton" name="expandAllTagsButton">
-             <property name="text">
-              <string>Expand all</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
+           <item row="3" column="1">
             <widget class="QPushButton" name="collapseAllTagsButton">
              <property name="text">
               <string>Collapse all</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="4" column="0">
             <widget class="QPushButton" name="newTagButton">
              <property name="text">
               <string>New Tag</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="4" column="1">
             <widget class="QPushButton" name="updateTagsButton">
              <property name="text">
               <string>Update Tags</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="2">
+            <widget class="QLineEdit" name="filterTagsEdit">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Filter:</string>
              </property>
             </widget>
            </item>
