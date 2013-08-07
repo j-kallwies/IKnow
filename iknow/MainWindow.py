@@ -68,6 +68,8 @@ class MainWindow(QtGui.QMainWindow):
         self.updateTagWidget()
 
     def updateTagWidget(self):
+        self.tagModel.updateTree()
+
         logging.debug("filter-Edit=%s" % self.ui.filterTagsEdit.text())
         filter = self.ui.filterTagsEdit.text()
         if filter == "":
@@ -79,7 +81,7 @@ class MainWindow(QtGui.QMainWindow):
             filterIDs.extend(foundIDs)
             for ID in foundIDs:
                 logging.debug("foundIDs=%s" % str(foundIDs))
-                filterIDs.extend(self.tagModel.getParentIDs(ID))
+                filterIDs.extend(self.tagModel.getParentIDsDownToRoot(ID))
                 filterIDs.extend(self.tagModel.getAllChildIDs(ID))
             filterIDs = set(filterIDs)
             logging.debug("filterIDs=" + str(filterIDs))

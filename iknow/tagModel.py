@@ -5,6 +5,8 @@ from PySide import QtGui
 from PySide import QtCore
 from PySide.QtCore import QModelIndex
 
+from multiParentTree import MultiParentTree
+
 def getFilterFromIDs(filterIDs, field):
     if filterIDs is None or len(filterIDs) == 0:
         return ""
@@ -34,14 +36,6 @@ class TagParentsModel(QtSql.QSqlTableModel):
         record.setValue(2, parentTagID)
         return self.insertRecord(self.rowCount()-1, record)
 
-    def getParentsTags(self, tagID):
-        parentTags = []
-        self.setFilter("tagID=%d" % tagID)
-        self.select()
-        logging.debug("%d parents found for tagID=%d" % (self.rowCount(), tagID))
-        parentTags = [self.record(i).value("parentTagID") for i in range(self.rowCount())]
-        return parentTags
-
 
 class TagModel(QtSql.QSqlTableModel):
     def __init__(self, db):
@@ -52,12 +46,8 @@ class TagModel(QtSql.QSqlTableModel):
 
         self.tagParentsModel = TagParentsModel(db)
 
-    def addTag(self, name):
-        self.setFilter("")
-        self.setSort(0, QtCore.Qt.SortOrder.DescendingOrder)
-        self.select()
-
-        self.setSort(0, QtCore.Qt.SortOrder.AscendingOrder)
+        self.tree = MultiParentTree()
+        self.updateTree()
 
     def addTag(self, name):
         self.setFilter("")
@@ -83,24 +73,19 @@ class TagModel(QtSql.QSqlTableModel):
             self.removeRow(0)
 
     def getTagNameFromID(self, ID):
-        self.setFilter("ID=%d" % ID)
-        self.select()
-        if self.rowCount() == 1:
-            return self.record(0).value("name")
+        elem = self.tree.getElementByID(ID)
+        if elem is not None:
+            return elem.data
 
     def hasID(self, ID):
-        self.setFilter("ID=%d" % ID)
-        self.select()
-        return self.rowCount() == 1
+        return self.tree.hasID(ID)
 
     def getChildIDs(self, ID, filterIDs=None):
-        if filterIDs is not None:
-            self.tagParentsModel.setFilter("(parentTagID = %d) AND (%s)" % (ID, getFilterFromIDs(filterIDs, "tagID")))
-        else:
-            self.tagParentsModel.setFilter("parentTagID = %d" % ID)
-        self.tagParentsModel.select()
-        childIDs = [self.tagParentsModel.record(i).value("tagID") for i in range(self.tagParentsModel.rowCount())]
-        return childIDs
+        #TODO: Implement filter
+        logging.debug("getChildIDs(%d)" % ID)
+        if not self.tree.hasID(ID):
+            return []
+        return self.tree.getElementByID(ID).getChildIDs()
 
     def getAllChildIDs(self, ID):
         childIDs = self.getChildIDs(ID)
@@ -110,14 +95,9 @@ class TagModel(QtSql.QSqlTableModel):
         return allChildIDs
 
     def fillTreeWidgetWithTags(self, treeWidget, checkable=False, IDstoCheck=set(), filterIDs=None):
+        self.updateTree(filterIDs)
+
         treeWidget.clear()
-
-        self.setFilter(getFilterFromIDs(filterIDs, field="ID"))
-
-        logging.debug("tags.filter()=%s" % self.filter())
-        self.select()
-
-        logging.debug("tags.rowCount()=%d" % self.rowCount())
 
         # Insert root tags
         rootTags = self.getRootTags(filterIDs)
@@ -137,9 +117,6 @@ class TagModel(QtSql.QSqlTableModel):
     def insertChildTags(self, ID, treeWidgetItem, checkable, IDstoCheck, filterIDs):
         if not self.hasID(ID):
             return
-
-        self.setFilter(getFilterFromIDs(filterIDs, field="ID"))
-        self.select()
 
         childTags = self.getChildTags(ID, filterIDs)
         logging.debug(self.getTagNameFromID(ID) + ": " + str(childTags))
@@ -162,31 +139,15 @@ class TagModel(QtSql.QSqlTableModel):
             self.expandDownToRoot(treeWidgetItem.parent())
 
     def getRootTags(self, filterIDs):
-        self.setFilter(getFilterFromIDs(filterIDs, field="ID"))
-        self.select()
-        self.tagParentsModel.setFilter(getFilterFromIDs(filterIDs, field="tagID"))
-        self.tagParentsModel.select()
-        rootTags = {}
-        for i in range(self.rowCount()):
-            ID = self.record(i).value("ID")
-            tag = self.record(i).value("name")
-            if not self.hasChildTags(ID):
-                rootTags[ID] = tag
-        return rootTags
+        #TODO: Implement filter
+        return self.tree.getRootElementsDict()
 
     def getChildTags(self, ID, filterIDs=None):
-        self.setFilter(getFilterFromIDs(filterIDs, field="ID"))
-        self.select()
-        childIDs = self.getChildIDs(ID, filterIDs)
-        childTags = {}
-        for childTagID in childIDs:
-            childTags[childTagID] = self.getTagNameFromID(childTagID)
-        return childTags
+        #TODO: Implement filter
+        return self.tree.getElementByID(ID).getChildDict()
 
     def hasChildTags(self, ID):
-        self.tagParentsModel.setFilter("tagID = %d" % ID)
-        self.tagParentsModel.select()
-        return self.tagParentsModel.rowCount() > 0
+        return self.tree.getElementByID(ID).hasParents()
 
     def getIDsFilteredByName(self, name):
         self.setFilter('name LIKE "%' + name + '%"')
@@ -196,7 +157,39 @@ class TagModel(QtSql.QSqlTableModel):
         return IDs
 
     def getParentIDs(self, ID):
-        parentIDs = self.tagParentsModel.getParentsTags(ID)
-        for parentID in self.tagParentsModel.getParentsTags(ID):
-            parentIDs.extend(self.getParentIDs(parentID))
-        return parentIDs
+        if self.tree.getElementByID(ID) is not None:
+            return self.tree.getElementByID(ID).getParentIDs()
+        else:
+            return []
+
+    def getParentIDsDownToRoot(self, ID):
+        allParentIDs = []
+        if self.tree.getElementByID(ID) is not None:
+            allParentIDs = self.tree.getElementByID(ID).getParentIDs()
+            for parentID in allParentIDs:
+                allParentIDs.extend(self.getParentIDsDownToRoot(parentID))
+        return allParentIDs
+
+    def getParentsTags(self, tagID):
+        self.tree.getElementByID(tagID).getParentIDs()
+
+    def updateTree(self, filterIDs=None):
+        self.tree = MultiParentTree()
+
+        self.setFilter(getFilterFromIDs(filterIDs, "ID"))
+        self.select()
+        logging.debug("FILTER="+self.filter())
+        logging.debug("self.rowCount()=%d" % self.rowCount())
+        for i in range(self.rowCount()):
+            ID = self.record(i).value("ID")
+            tag = self.record(i).value("name")
+            logging.debug("ID=%d" % ID)
+            logging.debug("tag=%s" % tag)
+            self.tree.insertElement(ID, tag)
+
+        self.tagParentsModel.setFilter(getFilterFromIDs(filterIDs, "tagID"))
+        self.tagParentsModel.select()
+        for i in range(self.tagParentsModel.rowCount()):
+            parentID = self.tagParentsModel.record(i).value("parentTagID")
+            childID = self.tagParentsModel.record(i).value("tagID")
+            self.tree.setRelationship(parentID, childID)
