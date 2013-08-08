@@ -7,6 +7,7 @@ from PySide import QtCore
 
 from ui.Ui_NewTagDialog import Ui_NewTagDialog
 
+
 class NewTagDialog(QtGui.QDialog):
     def __init__(self, parent, tagModel, tagParentsModel, parentID=1):
         super(NewTagDialog, self).__init__(parent)
@@ -52,7 +53,7 @@ class NewTagDialog(QtGui.QDialog):
         newID = self.tagModel.addTag(name)
         logging.debug(self.ui.parentTagSpinBox.value())
         for i in range(self.ui.assignedTagsList.rowCount()):
-            parentTagID = self.ui.assignedTagsList.item(i,0).data(0)
+            parentTagID = self.ui.assignedTagsList.item(i, 0).data(0)
             self.tagParentsModel.addParentTag(newID, parentTagID)
         logging.debug("Inserted new Tag with ID %d" % newID)
         self.close()

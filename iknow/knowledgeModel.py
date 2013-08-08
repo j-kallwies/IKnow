@@ -35,7 +35,7 @@ class KnowledgeTagsModel(QtSql.QSqlTableModel):
         record.append(QtSql.QSqlField("tag_ID"))
         record.setValue(1, knowledgeID)
         record.setValue(2, tagID)
-        return self.insertRecord(self.rowCount()-1, record)
+        return self.insertRecord(self.rowCount() - 1, record)
 
     def removeTagFromKnowledge(self, knowledgeID, tagID):
         self.setFilter("knowledge_ID=%d AND tag_ID=%d" % (knowledgeID, tagID))
@@ -82,15 +82,15 @@ class KnowledgeModel(QtSql.QSqlTableModel):
         record.setValue(1, title)
         record.setValue(2, description)
         record.setValue(3, "jan")
-        if not self.insertRecord(self.rowCount()-1, record):
+        if not self.insertRecord(self.rowCount() - 1, record):
             raise "Knowledge could not be inserted."
-        return int(self.record(self.rowCount()-1).value(0))
+        return int(self.record(self.rowCount() - 1).value(0))
 
     def updateKnowledge(self, row, title, description, newTagIDs):
         knowledgeID = self.record(row).value("ID")
 
-        self.setData( self.index(row, self.fieldIndex("title")), title )
-        self.setData( self.index(row, self.fieldIndex("description")), description )
+        self.setData(self.index(row, self.fieldIndex("title")), title)
+        self.setData(self.index(row, self.fieldIndex("description")), description)
         self.submitAll()
 
         logging.debug("updateKnowledge: knowledgeID=%d" % knowledgeID)

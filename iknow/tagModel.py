@@ -7,18 +7,20 @@ from PySide.QtCore import QModelIndex
 
 from multiParentTree import MultiParentTree
 
+
 def getFilterFromIDs(filterIDs, field):
     if filterIDs is None or len(filterIDs) == 0:
         return ""
     filterIDs = list(filterIDs)
     if len(filterIDs) == 1:
-        return field+"=%d" % filterIDs[0]
+        return field + "=%d" % filterIDs[0]
     else:
-        filter = field+"=%d" % filterIDs[0]
+        filter = field + "=%d" % filterIDs[0]
         for ID in filterIDs[1:]:
-            logging.debug(field+"=%d" % ID)
-            filter = filter + " OR "+field+"=%d" % ID
+            logging.debug(field + "=%d" % ID)
+            filter = filter + " OR " + field + "=%d" % ID
         return filter
+
 
 class TagParentsModel(QtSql.QSqlTableModel):
     def __init__(self, db):
@@ -34,7 +36,7 @@ class TagParentsModel(QtSql.QSqlTableModel):
         record.append(QtSql.QSqlField("parentTagID"))
         record.setValue(1, tagID)
         record.setValue(2, parentTagID)
-        return self.insertRecord(self.rowCount()-1, record)
+        return self.insertRecord(self.rowCount() - 1, record)
 
 
 class TagModel(QtSql.QSqlTableModel):
@@ -58,9 +60,9 @@ class TagModel(QtSql.QSqlTableModel):
         record.append(QtSql.QSqlField("ID"))
         record.append(QtSql.QSqlField("name"))
         record.setValue(1, name)
-        if not self.insertRecord(self.rowCount()-1, record):
+        if not self.insertRecord(self.rowCount() - 1, record):
             raise "Tag could not be inserted."
-        newID = int(self.record(self.rowCount()-1).value(0))
+        newID = int(self.record(self.rowCount() - 1).value(0))
         logging.debug("newID=%d" % newID)
 
         return newID
@@ -178,7 +180,7 @@ class TagModel(QtSql.QSqlTableModel):
 
         self.setFilter(getFilterFromIDs(filterIDs, "ID"))
         self.select()
-        logging.debug("FILTER="+self.filter())
+        logging.debug("FILTER=" + self.filter())
         logging.debug("self.rowCount()=%d" % self.rowCount())
         for i in range(self.rowCount()):
             ID = self.record(i).value("ID")

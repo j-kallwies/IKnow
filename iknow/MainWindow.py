@@ -12,6 +12,7 @@ from tagModel import TagModel
 from knowledgeModel import KnowledgeModel
 from databaseConnection import DatabaseConnection
 
+
 class MainWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -114,4 +115,3 @@ class MainWindow(QtGui.QMainWindow):
         self.knowledgeModel.setFilterByTagID(self.currentTag)
 
         logging.debug("currentTag = %d", self.currentTag)
-
