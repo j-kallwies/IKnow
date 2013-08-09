@@ -109,7 +109,7 @@ class MainWindow(QtGui.QMainWindow):
         logging.debug("Show NewKnowledgeDialog")
         newKnowledgeDlg = NewKnowledgeDialog(self, self.tagModel, self.tagModel.tagParentsModel, self.knowledgeModel, parentID=self.currentTag)
         newKnowledgeDlg.exec_()
-        self.knowledgeModel.setFilterByTagID(self.currentTag)
+        self.knowledgeModel.reload(self.currentTag)
 
     def showEditKnowledgeDialog(self, modelIndex):
         logging.debug("Show EditKnowledgeDialog")
@@ -120,9 +120,5 @@ class MainWindow(QtGui.QMainWindow):
 
     def tagChanged(self, current, previous):
         self.currentTag = int(current.text(1))
-        tagIDs = [self.currentTag]
-        tagIDs.extend(self.tagModel.getAllChildIDs(self.currentTag))
-        logging.debug("tagChanged: tagIDs= %s" % tagIDs)
-        self.knowledgeModel.setFilterByTagIDs(tagIDs)
-
         logging.debug("currentTag = %d", self.currentTag)
+        self.knowledgeModel.reload(self.currentTag)

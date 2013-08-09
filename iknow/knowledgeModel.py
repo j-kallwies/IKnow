@@ -3,7 +3,7 @@ import logging
 from PySide import QtCore
 from PySide import QtSql
 
-from tagModel import getFilterFromIDs
+from tagModel import getFilterFromIDs, TagModel
 
 
 class KnowledgeTagsModel(QtSql.QSqlTableModel):
@@ -55,6 +55,7 @@ class KnowledgeModel(QtSql.QSqlTableModel):
         logging.debug("%d rows in KnowledgeModel" % self.rowCount())
 
         self.knowledgeTagsModel = KnowledgeTagsModel(db)
+        self.tagModel = TagModel(db)
 
     def setFilterByTagIDs(self, tagIDs):
         knowledgeIDs = self.knowledgeTagsModel.getKnowledgeIDsFromTagIDs(tagIDs)
@@ -123,3 +124,13 @@ class KnowledgeModel(QtSql.QSqlTableModel):
 
     def getTagIDsFromKnowledgeID(self, knowledgeID):
         return self.knowledgeTagsModel.getTagIDsFromKnowledgeID(knowledgeID)
+
+    def reload(self, currentTag=None, filterText=None):
+        if currentTag is not None:
+            tagIDs = [currentTag]
+            tagIDs.extend(self.tagModel.getAllChildIDs(currentTag))
+        else:
+            tagIDs = []
+        logging.debug("reload(): tagIDs = %s" % str(tagIDs))
+        self.setFilterByTagIDsAndText(tagIDs, filterText)
+        self.select()
