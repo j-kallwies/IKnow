@@ -99,8 +99,6 @@ class TagModel(QtSql.QSqlTableModel):
     def fillTreeWidgetWithTags(self, treeWidget, checkable=False, IDstoCheck=set(), filterIDs=None):
         self.updateTree(filterIDs)
 
-        treeWidget.clear()
-
         # Insert root tags
         rootTags = self.getRootTags(filterIDs)
         logging.debug("rootTags=%s" % str(rootTags))

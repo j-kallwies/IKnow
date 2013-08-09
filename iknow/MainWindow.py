@@ -86,9 +86,17 @@ class MainWindow(QtGui.QMainWindow):
                 filterIDs.extend(self.tagModel.getAllChildIDs(ID))
             filterIDs = set(filterIDs)
             logging.debug("filterIDs=" + str(filterIDs))
-        self.tagModel.fillTreeWidgetWithTags(self.ui.tagTreeWidget, filterIDs=filterIDs)
 
-        if self.ui.filterTagsEdit.text() is not "":
+        # Clear tree
+        self.ui.tagTreeWidget.clear()
+
+        # No filter applied => Show all tags
+        if filter == "":
+            self.tagModel.fillTreeWidgetWithTags(self.ui.tagTreeWidget)
+
+        # Found tags with applied filter
+        if filter != "" and len(foundIDs) > 0:
+            self.tagModel.fillTreeWidgetWithTags(self.ui.tagTreeWidget, filterIDs=filterIDs)
             self.ui.tagTreeWidget.expandAll()
 
     def showNewTagButtonDialog(self):
