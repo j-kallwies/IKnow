@@ -3,6 +3,8 @@ import logging
 from PySide import QtCore
 from PySide import QtSql
 
+from tagModel import getFilterFromIDs
+
 
 class KnowledgeTagsModel(QtSql.QSqlTableModel):
     def __init__(self, db):
@@ -11,8 +13,8 @@ class KnowledgeTagsModel(QtSql.QSqlTableModel):
         self.select()
         logging.debug("%d rows in KnowledgeTagsModel" % self.rowCount())
 
-    def getKnowledgeIDsFromTagID(self, tagID):
-        self.setFilter("tag_ID=%d" % tagID)
+    def getKnowledgeIDsFromTagIDs(self, tagIDs):
+        self.setFilter(getFilterFromIDs(tagIDs, "tag_ID"))
         self.select()
         knowledgeIDs = []
         for i in range(self.rowCount()):
@@ -54,9 +56,9 @@ class KnowledgeModel(QtSql.QSqlTableModel):
 
         self.knowledgeTagsModel = KnowledgeTagsModel(db)
 
-    def setFilterByTagID(self, tagID):
-        knowledgeIDs = self.knowledgeTagsModel.getKnowledgeIDsFromTagID(tagID)
-        logging.debug("getKnowledgeIDsFromTagID(%d)=%s" % (tagID, str(knowledgeIDs)))
+    def setFilterByTagIDs(self, tagIDs):
+        knowledgeIDs = self.knowledgeTagsModel.getKnowledgeIDsFromTagIDs(tagIDs)
+        logging.debug("getKnowledgeIDsFromTagIDs(%s)=%s" % (str(tagIDs), str(knowledgeIDs)))
         if len(knowledgeIDs) == 0:
             filter = "False"
         else:

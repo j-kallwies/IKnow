@@ -112,6 +112,9 @@ class MainWindow(QtGui.QMainWindow):
 
     def tagChanged(self, current, previous):
         self.currentTag = int(current.text(1))
-        self.knowledgeModel.setFilterByTagID(self.currentTag)
+        tagIDs = [self.currentTag]
+        tagIDs.extend(self.tagModel.getAllChildIDs(self.currentTag))
+        logging.debug("tagChanged: tagIDs= %s" % tagIDs)
+        self.knowledgeModel.setFilterByTagIDs(tagIDs)
 
         logging.debug("currentTag = %d", self.currentTag)
