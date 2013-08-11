@@ -45,6 +45,7 @@ class MainWindow(QtGui.QMainWindow):
         self.updateTagWidget()
 
         self.currentTag = None
+        self.filterKnowledgeText = ""
 
         # Create menus
         act = QtGui.QAction("Remove selected Tag", self, statusTip="Remove the selected Tag. The child Tags are not touched.", triggered=self.removeSelectedTag)
@@ -58,6 +59,7 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.newKnowledgeButton.clicked.connect(self.showNewKnowledgeDialog)
 
         self.ui.filterTagsEdit.textChanged.connect(self.updateTagWidget)
+        self.ui.filterKnowledgeEdit.textChanged.connect(self.filterKnowledgeByText)
 
         self.ui.knowledgeTableView.doubleClicked.connect(self.showEditKnowledgeDialog)
 
@@ -109,7 +111,7 @@ class MainWindow(QtGui.QMainWindow):
         logging.debug("Show NewKnowledgeDialog")
         newKnowledgeDlg = NewKnowledgeDialog(self, self.tagModel, self.tagModel.tagParentsModel, self.knowledgeModel, parentID=self.currentTag)
         newKnowledgeDlg.exec_()
-        self.knowledgeModel.reload(self.currentTag)
+        self.reloadKnowledge()
 
     def showEditKnowledgeDialog(self, modelIndex):
         logging.debug("Show EditKnowledgeDialog")
@@ -121,4 +123,12 @@ class MainWindow(QtGui.QMainWindow):
     def tagChanged(self, current, previous):
         self.currentTag = int(current.text(1))
         logging.debug("currentTag = %d", self.currentTag)
-        self.knowledgeModel.reload(self.currentTag)
+        self.reloadKnowledge()
+
+    def filterKnowledgeByText(self, filterText):
+        self.filterKnowledgeText = filterText
+        logging.debug("filterKnowledgeByText: self.filterKnowledgeText=%s" % self.filterKnowledgeText)
+        self.reloadKnowledge()
+
+    def reloadKnowledge(self):
+        self.knowledgeModel.reload(self.currentTag, self.filterKnowledgeText)

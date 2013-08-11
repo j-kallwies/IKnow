@@ -57,19 +57,29 @@ class KnowledgeModel(QtSql.QSqlTableModel):
         self.knowledgeTagsModel = KnowledgeTagsModel(db)
         self.tagModel = TagModel(db)
 
-    def setFilterByTagIDs(self, tagIDs):
-        knowledgeIDs = self.knowledgeTagsModel.getKnowledgeIDsFromTagIDs(tagIDs)
-        logging.debug("getKnowledgeIDsFromTagIDs(%s)=%s" % (str(tagIDs), str(knowledgeIDs)))
-        if len(knowledgeIDs) == 0:
-            filter = "False"
+    def setFilterByTagIDsAndText(self, tagIDs, filterText):
+        if len(tagIDs) == 0:
+            filterByTags = "1"
         else:
-            filter = "ID=%d" % knowledgeIDs[0]
-            if len(knowledgeIDs) > 1:
-                for knowledgeID in knowledgeIDs[1:]:
-                    filter = filter + " OR ID=%d" % knowledgeID
+            knowledgeIDs = self.knowledgeTagsModel.getKnowledgeIDsFromTagIDs(tagIDs)
+            logging.debug("getKnowledgeIDsFromTagIDs(%s)=%s" % (str(tagIDs), str(knowledgeIDs)))
+            if len(knowledgeIDs) == 0:
+                filterByTags = "0"
+            else:
+                filterByTags = getFilterFromIDs(knowledgeIDs, "ID")
 
-        logging.debug("filter=%s" % filter)
-        self.setFilter(filter)
+        if filterText is not None and filterText != "":
+            filterByText = '(title LIKE "%' + filterText + '%") OR (description LIKE "%' + filterText + '%")'
+        else:
+            filterByText = ''
+
+        logging.debug('filterByTags="%s"' % filterByTags)
+        logging.debug('filterByText="%s"' % filterByText)
+        if filterByText != "":
+            self.setFilter("(%s) AND (%s)" % (filterByTags, filterByText))
+        else:
+            self.setFilter(filterByTags)
+        logging.debug('knowledgeModel.filter = "%s"' % self.filter())
         self.select()
 
     def addNewKnowledge(self, title, description):
