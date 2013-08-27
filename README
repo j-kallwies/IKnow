@@ -1,0 +1,3 @@
+# BEFORE FIRST RUN DO:
+cp Empty_DB.sqlite iknow/IKnow.sqlite
+make ui
