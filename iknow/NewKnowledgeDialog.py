@@ -26,7 +26,7 @@ class NewKnowledgeDialog(QtGui.QDialog):
             self.ui.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
             self.ui.buttonBox.accepted.connect(self.addNewKnowledge)
             if parentID is not None:
-                tagIDs = set({parentID})
+                tagIDs = set([parentID])
             else:
                 tagIDs = set()
             self.tagModel.fillTreeWidgetWithTags(self.ui.tagTreeWidget, checkable=True, IDstoCheck=tagIDs)

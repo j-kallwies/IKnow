@@ -177,9 +177,10 @@ class TagModel(QtSql.QSqlTableModel):
     def getChildTags(self, ID, filterIDs=None):
         self.setFilter(getFilterFromIDs(filterIDs, field="ID"))
         self.select()
-
         childIDs = self.getChildIDs(ID, filterIDs)
-        childTags = {childTagID: self.getTagNameFromID(childTagID) for childTagID in childIDs}
+        childTags = {}
+        for childTagID in childIDs:
+            childTags[childTagID] = self.getTagNameFromID(childTagID)
         return childTags
 
     def hasChildTags(self, ID):
