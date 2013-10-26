@@ -66,6 +66,18 @@
                <pointsize>12</pointsize>
               </font>
              </property>
+             <property name="acceptDrops">
+              <bool>true</bool>
+             </property>
+             <property name="dragEnabled">
+              <bool>true</bool>
+             </property>
+             <property name="dragDropOverwriteMode">
+              <bool>false</bool>
+             </property>
+             <property name="dragDropMode">
+              <enum>QAbstractItemView::DragDrop</enum>
+             </property>
              <column>
               <property name="text">
                <string>Tag</string>
