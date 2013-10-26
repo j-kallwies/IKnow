@@ -46,14 +46,14 @@
            </size>
           </property>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="3" column="0">
+           <item row="6" column="0">
             <widget class="QPushButton" name="expandAllTagsButton">
              <property name="text">
               <string>Expand all</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="0" colspan="2">
+           <item row="5" column="0" colspan="2">
             <widget class="QTreeWidget" name="tagTreeWidget">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -84,31 +84,24 @@
              </column>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="6" column="1">
             <widget class="QPushButton" name="collapseAllTagsButton">
              <property name="text">
               <string>Collapse all</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
+           <item row="7" column="0">
             <widget class="QPushButton" name="newTagButton">
              <property name="text">
               <string>New Tag</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
+           <item row="7" column="1">
             <widget class="QPushButton" name="updateTagsButton">
              <property name="text">
               <string>Update Tags</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="QLineEdit" name="filterTagsEdit">
-             <property name="text">
-              <string/>
              </property>
             </widget>
            </item>
@@ -117,6 +110,44 @@
              <property name="text">
               <string>Filter:</string>
              </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="2">
+            <widget class="QWidget" name="widget_3" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <property name="spacing">
+               <number>3</number>
+              </property>
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLineEdit" name="filterTagsEdit">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="clearTagFilterButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>20</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>x</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -133,7 +164,32 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="filterKnowledgeEdit"/>
+            <widget class="QWidget" name="widget_4" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <property name="spacing">
+               <number>2</number>
+              </property>
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLineEdit" name="filterKnowledgeEdit"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="clearKnowledgeFilterButton">
+                <property name="maximumSize">
+                 <size>
+                  <width>20</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>x</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </item>
            <item>
             <widget class="QTableView" name="knowledgeTableView">
@@ -176,7 +232,7 @@
      <x>0</x>
      <y>0</y>
      <width>1118</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
@@ -213,6 +269,38 @@
     <hint type="destinationlabel">
      <x>156</x>
      <y>320</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearTagFilterButton</sender>
+   <signal>clicked()</signal>
+   <receiver>filterTagsEdit</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>350</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>183</x>
+     <y>119</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearKnowledgeFilterButton</sender>
+   <signal>clicked()</signal>
+   <receiver>filterKnowledgeEdit</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1078</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>725</x>
+     <y>119</y>
     </hint>
    </hints>
   </connection>
