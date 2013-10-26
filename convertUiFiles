@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 pyside-uic iknow/ui/mainwindow.ui > iknow/ui/Ui_MainWindow.py
 pyside-uic iknow/ui/newTagDialog.ui > iknow/ui/Ui_NewTagDialog.py
 pyside-uic iknow/ui/newKnowledgeDialog.ui > iknow/ui/Ui_NewKnowledgeDialog.py
