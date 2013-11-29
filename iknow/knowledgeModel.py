@@ -66,8 +66,9 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         print("update()")
         self._data = []
         for curr in self.db.all('id'):
-            print("***DATA***: %s" % str(curr))
-            self._data.append(curr)
+            if curr["_t"] == "knowledge":
+                print("***DATA***: %s" % str(curr))
+                self._data.append(curr)
 
         topLeft = self.index(0, 0);
         bottomRight = self.index(self.rowCount() - 1, self.columnCount() - 1)
