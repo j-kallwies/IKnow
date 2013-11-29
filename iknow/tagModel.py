@@ -172,25 +172,21 @@ class TagModel(QtCore.QAbstractTableModel):
         self.tree.getElementByID(tagID).getParentIDs()
 
     def updateTree(self, filterIDs=None):
-        pass
-        """
         self.tree = MultiParentTree()
 
-        self.setFilter(getFilterFromIDs(filterIDs, "ID"))
-        self.select()
-        logging.debug("FILTER=" + self.filter())
-        logging.debug("self.rowCount()=%d" % self.rowCount())
-        for i in range(self.rowCount()):
-            ID = self.record(i).value("ID")
-            tag = self.record(i).value("name")
-            logging.debug("ID=%d" % ID)
-            logging.debug("tag=%s" % tag)
-            self.tree.insertElement(ID, tag)
+        #TODO: Implement filter!
 
-        self.tagParentsModel.setFilter(getFilterFromIDs(filterIDs, "tagID"))
-        self.tagParentsModel.select()
-        for i in range(self.tagParentsModel.rowCount()):
-            parentID = self.tagParentsModel.record(i).value("parentTagID")
-            childID = self.tagParentsModel.record(i).value("tagID")
-            self.tree.setRelationship(parentID, childID)
-        """
+        for curr in self.db.all('id'):
+            if curr["_t"] == "tag":
+                ID = curr["_id"]
+                tag = curr["name"]
+                logging.debug("ID=%s" % str(ID))
+                logging.debug("tag=%s" % tag)
+                self.tree.insertElement(ID, tag)
+
+        for curr in self.db.all('id'):
+            if curr["_t"] == "tag":
+                childID = curr["_id"]
+                parentIDs = curr["parents"]
+                for parentID in parentIDs:
+                    self.tree.setRelationship(parentID, childID)
