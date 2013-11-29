@@ -53,8 +53,8 @@ class TagModel(QtCore.QAbstractTableModel):
         #TODO: Implement
         return 0
 
-    def addTag(self, name):
-        newData = {"_t": "tag", "name": str(name), "parents": []}
+    def addTag(self, name, parents):
+        newData = {"_t": "tag", "name": name, "parents": parents}
         res = self.db.insert(newData)
 
         return res['_id']
@@ -73,6 +73,9 @@ class TagModel(QtCore.QAbstractTableModel):
         elem = self.tree.getElementByID(ID)
         if elem is not None:
             return elem.data
+
+    def getAllIDs(self):
+        return [curr["_id"] for curr in self.db.all('id') if curr["_t"] == "tag"]
 
     def hasID(self, ID):
         return self.tree.hasID(ID)

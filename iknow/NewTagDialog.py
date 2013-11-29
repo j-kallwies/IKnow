@@ -9,7 +9,7 @@ from ui.Ui_NewTagDialog import Ui_NewTagDialog
 
 
 class NewTagDialog(QtGui.QDialog):
-    def __init__(self, parent, tagModel, tagParentsModel, parentID=1):
+    def __init__(self, parent, tagModel, tagParentsModel, parentID=""):
         super(NewTagDialog, self).__init__(parent)
         self.ui = Ui_NewTagDialog()
         self.ui.setupUi(self)
@@ -17,19 +17,24 @@ class NewTagDialog(QtGui.QDialog):
         self.tagModel = tagModel
         self.tagParentsModel = tagParentsModel
 
+        for ID in tagModel.getAllIDs():
+            self.ui.parentTagComboBox.addItem(ID)
+        #self.updateParentTagName(self.ui.parentTagComboBox.currentIndex())
+        self.updateParentTagName()
+
         if parentID is not None:
-            self.ui.parentTagSpinBox.setValue(parentID)
+            self.ui.parentTagComboBox.setValue(parentID)
             self.updateParentTagName(parentID)
             self.addTag()
 
         self.setWindowTitle("Add new Tag")
 
-        self.ui.parentTagSpinBox.valueChanged.connect(self.updateParentTagName)
+        self.ui.parentTagComboBox.currentIndexChanged.connect(self.updateParentTagName)
         self.ui.addTagButton.clicked.connect(self.addTag)
         self.ui.removeTagButton.clicked.connect(self.removeTag)
 
     def addTag(self):
-        newTagID = self.ui.parentTagSpinBox.value()
+        newTagID = str(self.ui.parentTagComboBox.currentText())
         newTagName = self.tagModel.getTagNameFromID(newTagID)
         row = self.ui.assignedTagsList.rowCount()
         self.ui.assignedTagsList.insertRow(row)
@@ -49,15 +54,19 @@ class NewTagDialog(QtGui.QDialog):
         if name == "":
             return
 
-        logging.debug("Add new Tag \"%s\"..." % name)
-        newID = self.tagModel.addTag(name)
-        logging.debug(self.ui.parentTagSpinBox.value())
+        parentTagIDs = []
         for i in range(self.ui.assignedTagsList.rowCount()):
-            parentTagID = self.ui.assignedTagsList.item(i, 0).data(0)
-            self.tagParentsModel.addParentTag(newID, parentTagID)
+            parentTagIDs.append(str(self.ui.assignedTagsList.item(i, 0).data(0)))
+
+        logging.debug("Add new Tag \"%s\" with parents %s..." % (name, str(parentTagIDs)))
+
+        newID = self.tagModel.addTag(name, parentTagIDs)
+        logging.debug(self.ui.parentTagComboBox.currentText())
         logging.debug("Inserted new Tag with ID %s" % str(newID))
         self.close()
 
-    def updateParentTagName(self, value):
-        logging.debug("parentID=%d" % value)
-        self.ui.parentTagLabel.setText(self.tagModel.getTagNameFromID(value))
+    def updateParentTagName(self):
+        ID = str(self.ui.parentTagComboBox.currentText())
+        tagName = self.tagModel.getTagNameFromID(ID)
+        if tagName is not None:
+            self.ui.parentTagLabel.setText(tagName)

@@ -89,13 +89,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QSpinBox" name="parentTagSpinBox">
-        <property name="maximum">
-         <number>999999999</number>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0" colspan="3">
        <widget class="QTableWidget" name="assignedTagsList">
         <property name="alternatingRowColors">
@@ -118,6 +111,9 @@
          </property>
         </column>
        </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QComboBox" name="parentTagComboBox"/>
       </item>
      </layout>
     </widget>
