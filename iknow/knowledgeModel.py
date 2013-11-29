@@ -69,6 +69,12 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
             print("***DATA***: %s" % str(curr))
             self._data.append(curr)
 
+        topLeft = self.index(0, 0);
+        bottomRight = self.index(self.rowCount() - 1, self.columnCount() - 1)
+
+        self.dataChanged.emit(topLeft, bottomRight) # TODO: Do it only if data really changed
+        self.layoutChanged.emit() # TODO: Do it only if row- or column-count changed
+
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self._data)
 
