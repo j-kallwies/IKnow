@@ -57,22 +57,6 @@ class TagModel(QtCore.QAbstractTableModel):
         res = self.db.insert(newData)
 
         return res['_id']
-        """
-        self.setFilter("")
-        self.setSort(0, QtCore.Qt.SortOrder.AscendingOrder)
-        self.select()
-
-        record = QtSql.QSqlRecord()
-        record.append(QtSql.QSqlField("ID"))
-        record.append(QtSql.QSqlField("name"))
-        record.setValue(1, name)
-        if not self.insertRecord(self.rowCount() - 1, record):
-            raise "Tag could not be inserted."
-        newID = int(self.record(self.rowCount() - 1).value(0))
-        logging.debug("newID=%d" % newID)
-
-        return newID
-        """
 
     def removeTag(self, ID):
         pass
