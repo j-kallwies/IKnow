@@ -22,7 +22,7 @@ def getFilterFromIDs(filterIDs, field):
 
 class TagParentsModel():
     def __init__(self, db):
-        pass
+        self.db = db
 
     def addParentTag(self, tagID, parentTagID):
         pass
@@ -40,6 +40,8 @@ class TagModel(QtCore.QAbstractTableModel):
     def __init__(self, db):
         super(TagModel, self).__init__()
 
+        self.db = db
+
         self.tagParentsModel = TagParentsModel(db)
         """
         self.setTable("tags")
@@ -51,7 +53,10 @@ class TagModel(QtCore.QAbstractTableModel):
         """
 
     def addTag(self, name):
-        pass
+        newData = {"_t": "tag", "name": str(name), "parents": []}
+        res = self.db.insert(newData)
+
+        return res['_id']
         """
         self.setFilter("")
         self.setSort(0, QtCore.Qt.SortOrder.AscendingOrder)

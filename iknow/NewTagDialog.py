@@ -55,7 +55,7 @@ class NewTagDialog(QtGui.QDialog):
         for i in range(self.ui.assignedTagsList.rowCount()):
             parentTagID = self.ui.assignedTagsList.item(i, 0).data(0)
             self.tagParentsModel.addParentTag(newID, parentTagID)
-        logging.debug("Inserted new Tag with ID %d" % newID)
+        logging.debug("Inserted new Tag with ID %s" % str(newID))
         self.close()
 
     def updateParentTagName(self, value):
