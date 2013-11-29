@@ -85,42 +85,28 @@ class TagModel(QtCore.QAbstractTableModel):
         """
 
     def getTagNameFromID(self, ID):
-        pass
-        """
         elem = self.tree.getElementByID(ID)
         if elem is not None:
             return elem.data
-        """
 
     def hasID(self, ID):
-        pass
-        """
         return self.tree.hasID(ID)
-        """
 
     def getChildIDs(self, ID, filterIDs=None):
-        pass
-        """
         #TODO: Implement filter
         logging.debug("getChildIDs(%d)" % ID)
         if not self.tree.hasID(ID):
             return []
         return self.tree.getElementByID(ID).getChildIDs()
-        """
 
     def getAllChildIDs(self, ID):
-        pass
-        """
         childIDs = self.getChildIDs(ID)
         allChildIDs = childIDs
         for childID in childIDs:
             allChildIDs.extend(self.getAllChildIDs(childID))
         return allChildIDs
-        """
 
     def fillTreeWidgetWithTags(self, treeWidget, checkable=False, IDstoCheck=set(), filterIDs=None):
-        pass
-        """
         self.updateTree(filterIDs)
 
         # Insert root tags
@@ -137,11 +123,8 @@ class TagModel(QtCore.QAbstractTableModel):
                     self.expandDownToRoot(newElem)
             treeWidget.insertTopLevelItem(0, newElem)
             self.insertChildTags(rootID, newElem, checkable, IDstoCheck, filterIDs)
-        """
 
     def insertChildTags(self, ID, treeWidgetItem, checkable, IDstoCheck, filterIDs):
-        pass
-        """
         if not self.hasID(ID):
             return
 
@@ -159,35 +142,22 @@ class TagModel(QtCore.QAbstractTableModel):
                         self.expandDownToRoot(newElem)
                 if self.hasChildTags(childID):
                     self.insertChildTags(childID, newElem, checkable, IDstoCheck, filterIDs)
-        """
 
     def expandDownToRoot(self, treeWidgetItem):
-        pass
-        """
         treeWidgetItem.setExpanded(True)
         if treeWidgetItem.parent() is not None:
             self.expandDownToRoot(treeWidgetItem.parent())
-        """
 
     def getRootTags(self, filterIDs):
-        pass
-        """
         #TODO: Implement filter
         return self.tree.getRootElementsDict()
-        """
 
     def getChildTags(self, ID, filterIDs=None):
-        pass
-        """
         #TODO: Implement filter
         return self.tree.getElementByID(ID).getChildDict()
-        """
 
     def hasChildTags(self, ID):
-        pass
-        """
         return self.tree.getElementByID(ID).hasParents()
-        """
 
     def getIDsFilteredByName(self, name):
         pass
@@ -200,30 +170,21 @@ class TagModel(QtCore.QAbstractTableModel):
         """
 
     def getParentIDs(self, ID):
-        pass
-        """
         if self.tree.getElementByID(ID) is not None:
             return self.tree.getElementByID(ID).getParentIDs()
         else:
             return []
-        """
 
     def getParentIDsDownToRoot(self, ID):
-        pass
-        """
         allParentIDs = []
         if self.tree.getElementByID(ID) is not None:
             allParentIDs = self.tree.getElementByID(ID).getParentIDs()
             for parentID in allParentIDs:
                 allParentIDs.extend(self.getParentIDsDownToRoot(parentID))
         return allParentIDs
-        """
 
     def getParentsTags(self, tagID):
-        pass
-        """
         self.tree.getElementByID(tagID).getParentIDs()
-        """
 
     def updateTree(self, filterIDs=None):
         pass
