@@ -43,14 +43,15 @@ class TagModel(QtCore.QAbstractTableModel):
         self.db = db
 
         self.tagParentsModel = TagParentsModel(db)
-        """
-        self.setTable("tags")
-        self.select()
+
         logging.debug("%d rows in TagModel" % self.rowCount())
 
         self.tree = MultiParentTree()
         self.updateTree()
-        """
+
+    def rowCount(self):
+        #TODO: Implement
+        return 0
 
     def addTag(self, name):
         newData = {"_t": "tag", "name": str(name), "parents": []}
