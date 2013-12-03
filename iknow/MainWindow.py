@@ -65,8 +65,8 @@ class MainWindow(QtGui.QMainWindow):
 
     def removeSelectedTag(self):
         selectedItem = self.ui.tagTreeWidget.selectedItems()[0]
-        IDtoRemove = int(selectedItem.text(1))
-        logging.debug("Remove selected Tag (ID=%d)." % IDtoRemove)
+        IDtoRemove = selectedItem.text(1)
+        logging.debug("Remove selected Tag (ID=%s)." % IDtoRemove)
         self.tagModel.removeTag(IDtoRemove)
         self.updateTagWidget()
 
@@ -121,8 +121,8 @@ class MainWindow(QtGui.QMainWindow):
         self.knowledgeModel.setFilterByTagID(self.currentTag)
 
     def tagChanged(self, current, previous):
-        self.currentTag = int(current.text(1))
-        logging.debug("currentTag = %d", self.currentTag)
+        self.currentTag = current.text(1)
+        logging.debug("currentTag = %s", self.currentTag)
         self.reloadKnowledge()
 
     def filterKnowledgeByText(self, filterText):
