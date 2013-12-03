@@ -37,8 +37,8 @@ class NewKnowledgeDialog(QtGui.QDialog):
             self.ui.buttonBox.button(QtGui.QDialogButtonBox.Apply).clicked.connect(self.updateModel)
             self.ui.buttonBox.accepted.connect(self.updateModelAndClose)
 
-            self.knowledgeID = self.knowledgeModel.record(editRow).value("ID")
-            logging.debug("self.knowledgeID=%d" % self.knowledgeID)
+            self.knowledgeID = self.knowledgeModel.getIDByRow(editRow)
+            logging.debug("self.knowledgeID=%s" % self.knowledgeID)
             self.editRow = editRow
             self.resetDataFromModel()
         self.ui.buttonBox.rejected.connect(self.close)
@@ -65,10 +65,9 @@ class NewKnowledgeDialog(QtGui.QDialog):
     def resetDataFromModel(self):
         self.addTagsFromModel()
 
-        title = self.knowledgeModel.record(self.editRow).value("title")
-        description = self.knowledgeModel.record(self.editRow).value("description")
-        self.ui.tagNameEdit.setText(title)
-        self.ui.plainTextEdit.setPlainText(description)
+        data = self.knowledgeModel.getDataDictByID(self.knowledgeID)
+        self.ui.tagNameEdit.setText(data["title"])
+        self.ui.plainTextEdit.setPlainText(data["description"])
 
     def updateModel(self):
         logging.debug("updateModel")

@@ -82,6 +82,11 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
     def columnCount(self, parent=QtCore.QModelIndex()):
         return len(self.columns)
 
+    def getDataDictByID(self, ID):
+        for data in self._data:
+            if data["_id"] == ID:
+                return data
+
     def data(self, index, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole:
             row = index.row()
@@ -89,6 +94,9 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
             return self._data[row][col]
         else:
             return None
+
+    def getIDByRow(self, row):
+        return self._data[row]["_id"]
 
     def flags(self, index):
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
@@ -185,10 +193,10 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         """
 
     def getTagIDsFromKnowledgeID(self, knowledgeID):
-        pass
-        """
-        return self.knowledgeTagsModel.getTagIDsFromKnowledgeID(knowledgeID)
-        """
+        if "tags" in self.getDataDictByID(knowledgeID):
+            return self.getDataDictByID(knowledgeID)["tags"]
+        else:
+            return []
 
     def reload(self, currentTag=None, filterText=None):
         pass
