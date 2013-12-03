@@ -126,7 +126,7 @@ class MainWindow(QtGui.QMainWindow):
         self.reloadKnowledge()
 
     def filterKnowledgeByText(self, filterText):
-        self.filterKnowledgeText = filterText
+        self.filterKnowledgeText = str(filterText)
         logging.debug("filterKnowledgeByText: self.filterKnowledgeText=%s" % self.filterKnowledgeText)
         self.reloadKnowledge()
 

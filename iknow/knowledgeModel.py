@@ -56,6 +56,7 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         self.tagModel = TagModel(db)
 
         self._filterByTagIDs = set()
+        self._filterByText = ""
 
         self.columns = ["_id", "_rev", "title", "description"]
 
@@ -72,7 +73,13 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
                 tags = set(curr["tags"])
                 print("***DATA***: %s" % str(curr))
 
+                # Filter by tags
                 if len(self._filterByTagIDs) > 0 and len(tags & self._filterByTagIDs) == 0:
+                    continue
+
+                # Filter by text
+                # TODO: Always accepts "{" and "}" => Fail
+                if self._filterByText.lower() not in str(curr).lower():
                     continue
 
                 self._data.append(curr)
