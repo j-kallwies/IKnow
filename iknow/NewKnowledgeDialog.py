@@ -39,7 +39,6 @@ class NewKnowledgeDialog(QtGui.QDialog):
 
             self.knowledgeID = self.knowledgeModel.getIDByRow(editRow)
             logging.debug("self.knowledgeID=%s" % self.knowledgeID)
-            self.editRow = editRow
             self.resetDataFromModel()
         self.ui.buttonBox.rejected.connect(self.close)
 
