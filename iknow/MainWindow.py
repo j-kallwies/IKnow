@@ -23,20 +23,20 @@ class MainWindow(QtGui.QMainWindow):
 
         # DB-Connection
         self.dbConnection = DatabaseConnection()
-        if self.dbConnection.connect():
-            logging.info("Connected to the Database")
-        else:
-            logging.error("Failed to connect to the database")
 
         # Create Models
         self.tagModel = TagModel(self.dbConnection.db)
         self.knowledgeModel = KnowledgeModel(self.dbConnection.db)
 
+        print("%d rows!" % self.knowledgeModel.rowCount())
+
         # Setup views
         self.ui.knowledgeTableView.setModel(self.knowledgeModel)
-        self.ui.knowledgeTableView.hideColumn(0)
-        self.ui.knowledgeTableView.setColumnWidth(1, 600)
-        self.ui.knowledgeTableView.setColumnWidth(2, 700)
+        #self.ui.knowledgeTableView.hideColumn(0)
+        self.ui.knowledgeTableView.setColumnWidth(0, 300)
+        self.ui.knowledgeTableView.setColumnWidth(1, 100)
+        self.ui.knowledgeTableView.setColumnWidth(2, 300)
+        self.ui.knowledgeTableView.setColumnWidth(3, 500)
 
         self.ui.tagTreeWidget.setColumnWidth(0, 300)
         self.ui.tagTreeWidget.setColumnWidth(1, 30)

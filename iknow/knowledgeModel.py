@@ -1,11 +1,10 @@
 import logging
 
 from PySide import QtCore
-from PySide import QtSql
 
 from tagModel import getFilterFromIDs, TagModel
 
-
+"""
 class KnowledgeTagsModel(QtSql.QSqlTableModel):
     def __init__(self, db):
         super(KnowledgeTagsModel, self).__init__(None, db)
@@ -45,19 +44,64 @@ class KnowledgeTagsModel(QtSql.QSqlTableModel):
         while self.rowCount() > 0:
             logging.debug("Removing tagID %d from knowledgeID %d" % (tagID, knowledgeID))
             self.removeRow(0)
+"""
 
 
-class KnowledgeModel(QtSql.QSqlTableModel):
+class KnowledgeModel(QtCore.QAbstractTableModel):
     def __init__(self, db):
-        super(KnowledgeModel, self).__init__(None, db)
-        self.setTable("knowledge")
-        self.select()
-        logging.debug("%d rows in KnowledgeModel" % self.rowCount())
+        super(KnowledgeModel, self).__init__()
 
-        self.knowledgeTagsModel = KnowledgeTagsModel(db)
+        self.db = db
+
         self.tagModel = TagModel(db)
 
+        self.columns = ["_id", "_rev", "title", "description"]
+
+        self.update()
+
+        # TODO: Load rows before!
+        logging.debug("%d rows in KnowledgeModel" % self.rowCount())
+
+    def update(self):
+        print("update()")
+        self._data = []
+        for curr in self.db.all('id'):
+            print("***DATA***: %s" % str(curr))
+            self._data.append(curr)
+
+    def rowCount(self, parent=QtCore.QModelIndex()):
+        return len(self._data)
+
+    def columnCount(self, parent=QtCore.QModelIndex()):
+        return len(self.columns)
+
+    def data(self, index, role=QtCore.Qt.DisplayRole):
+        if role == QtCore.Qt.DisplayRole:
+            row = index.row()
+            col = self.columns[index.column()]
+            return self._data[row][col]
+        else:
+            return None
+
+    def flags(self, index):
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+
+    def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
+        """ Set the headers to be displayed. """
+        if role != QtCore.Qt.DisplayRole:
+            return None
+
+        if orientation == QtCore.Qt.Horizontal:
+            if section < len(self.columns):
+                return self.columns[section]
+            else:
+                return str(section)
+
+        return None
+
     def setFilterByTagIDsAndText(self, tagIDs, filterText):
+        pass
+        """
         if len(tagIDs) == 0:
             filterByTags = "1"
         else:
@@ -81,25 +125,19 @@ class KnowledgeModel(QtSql.QSqlTableModel):
             self.setFilter(filterByTags)
         logging.debug('knowledgeModel.filter = "%s"' % self.filter())
         self.select()
+        """
 
     def addNewKnowledge(self, title, description):
-        self.setFilter("")
-        self.setSort(0, QtCore.Qt.SortOrder.AscendingOrder)
-        self.select()
+        newData = {"_t": "knowledge", "title": str(title), "description": str(description)}
+        res = self.db.insert(newData)
 
-        record = QtSql.QSqlRecord()
-        record.append(QtSql.QSqlField("ID"))
-        record.append(QtSql.QSqlField("title"))
-        record.append(QtSql.QSqlField("description"))
-        record.append(QtSql.QSqlField("author"))
-        record.setValue(1, title)
-        record.setValue(2, description)
-        record.setValue(3, "jan")
-        if not self.insertRecord(self.rowCount() - 1, record):
-            raise "Knowledge could not be inserted."
-        return int(self.record(self.rowCount() - 1).value(0))
+        self.update()
+
+        return res['_id']
 
     def updateKnowledge(self, row, title, description, newTagIDs):
+        pass
+        """
         knowledgeID = self.record(row).value("ID")
 
         self.setData(self.index(row, self.fieldIndex("title")), title)
@@ -125,17 +163,29 @@ class KnowledgeModel(QtSql.QSqlTableModel):
 
         for tagID in tagIDsToRemove:
             self.removeTagFromKnowledge(knowledgeID, tagID)
+        """
 
     def removeTagFromKnowledge(self, knowledgeID, tagID):
+        pass
+        """
         self.knowledgeTagsModel.removeTagFromKnowledge(knowledgeID, tagID)
+        """
 
     def addTagForKnowledge(self, knowledgeID, tagID):
+        pass
+        """
         self.knowledgeTagsModel.addTagForKnowledge(knowledgeID, tagID)
+        """
 
     def getTagIDsFromKnowledgeID(self, knowledgeID):
+        pass
+        """
         return self.knowledgeTagsModel.getTagIDsFromKnowledgeID(knowledgeID)
+        """
 
     def reload(self, currentTag=None, filterText=None):
+        pass
+        """
         if currentTag is not None:
             tagIDs = [currentTag]
             tagIDs.extend(self.tagModel.getAllChildIDs(currentTag))
@@ -144,3 +194,4 @@ class KnowledgeModel(QtSql.QSqlTableModel):
         logging.debug("reload(): tagIDs = %s" % str(tagIDs))
         self.setFilterByTagIDsAndText(tagIDs, filterText)
         self.select()
+        """

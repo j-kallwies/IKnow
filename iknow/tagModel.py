@@ -1,9 +1,8 @@
 import logging
 
-from PySide import QtSql
+
 from PySide import QtGui
 from PySide import QtCore
-from PySide.QtCore import QModelIndex
 
 from multiParentTree import MultiParentTree
 
@@ -21,15 +20,13 @@ def getFilterFromIDs(filterIDs, field):
             filter = filter + " OR " + field + "=%d" % ID
         return filter
 
-
-class TagParentsModel(QtSql.QSqlTableModel):
+class TagParentsModel():
     def __init__(self, db):
-        super(TagParentsModel, self).__init__(None, db)
-        self.setTable("tag_parents")
-        self.select()
-        logging.debug("%d rows in TagParentsModel" % self.rowCount())
+        pass
 
     def addParentTag(self, tagID, parentTagID):
+        pass
+        """
         record = QtSql.QSqlRecord()
         record.append(QtSql.QSqlField("ID"))
         record.append(QtSql.QSqlField("tagID"))
@@ -37,21 +34,25 @@ class TagParentsModel(QtSql.QSqlTableModel):
         record.setValue(1, tagID)
         record.setValue(2, parentTagID)
         return self.insertRecord(self.rowCount() - 1, record)
+        """
 
-
-class TagModel(QtSql.QSqlTableModel):
+class TagModel(QtCore.QAbstractTableModel):
     def __init__(self, db):
-        super(TagModel, self).__init__(None, db)
+        super(TagModel, self).__init__()
+
+        self.tagParentsModel = TagParentsModel(db)
+        """
         self.setTable("tags")
         self.select()
         logging.debug("%d rows in TagModel" % self.rowCount())
 
-        self.tagParentsModel = TagParentsModel(db)
-
         self.tree = MultiParentTree()
         self.updateTree()
+        """
 
     def addTag(self, name):
+        pass
+        """
         self.setFilter("")
         self.setSort(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.select()
@@ -66,37 +67,55 @@ class TagModel(QtSql.QSqlTableModel):
         logging.debug("newID=%d" % newID)
 
         return newID
+        """
 
     def removeTag(self, ID):
+        pass
+        """
         self.setFilter("ID=%d" % ID)
         self.select()
         logging.debug("removeTag: self.rowCount()=%d" % self.rowCount())
         if self.rowCount() == 1:
             self.removeRow(0)
+        """
 
     def getTagNameFromID(self, ID):
+        pass
+        """
         elem = self.tree.getElementByID(ID)
         if elem is not None:
             return elem.data
+        """
 
     def hasID(self, ID):
+        pass
+        """
         return self.tree.hasID(ID)
+        """
 
     def getChildIDs(self, ID, filterIDs=None):
+        pass
+        """
         #TODO: Implement filter
         logging.debug("getChildIDs(%d)" % ID)
         if not self.tree.hasID(ID):
             return []
         return self.tree.getElementByID(ID).getChildIDs()
+        """
 
     def getAllChildIDs(self, ID):
+        pass
+        """
         childIDs = self.getChildIDs(ID)
         allChildIDs = childIDs
         for childID in childIDs:
             allChildIDs.extend(self.getAllChildIDs(childID))
         return allChildIDs
+        """
 
     def fillTreeWidgetWithTags(self, treeWidget, checkable=False, IDstoCheck=set(), filterIDs=None):
+        pass
+        """
         self.updateTree(filterIDs)
 
         # Insert root tags
@@ -113,8 +132,11 @@ class TagModel(QtSql.QSqlTableModel):
                     self.expandDownToRoot(newElem)
             treeWidget.insertTopLevelItem(0, newElem)
             self.insertChildTags(rootID, newElem, checkable, IDstoCheck, filterIDs)
+        """
 
     def insertChildTags(self, ID, treeWidgetItem, checkable, IDstoCheck, filterIDs):
+        pass
+        """
         if not self.hasID(ID):
             return
 
@@ -132,48 +154,75 @@ class TagModel(QtSql.QSqlTableModel):
                         self.expandDownToRoot(newElem)
                 if self.hasChildTags(childID):
                     self.insertChildTags(childID, newElem, checkable, IDstoCheck, filterIDs)
+        """
 
     def expandDownToRoot(self, treeWidgetItem):
+        pass
+        """
         treeWidgetItem.setExpanded(True)
         if treeWidgetItem.parent() is not None:
             self.expandDownToRoot(treeWidgetItem.parent())
+        """
 
     def getRootTags(self, filterIDs):
+        pass
+        """
         #TODO: Implement filter
         return self.tree.getRootElementsDict()
+        """
 
     def getChildTags(self, ID, filterIDs=None):
+        pass
+        """
         #TODO: Implement filter
         return self.tree.getElementByID(ID).getChildDict()
+        """
 
     def hasChildTags(self, ID):
+        pass
+        """
         return self.tree.getElementByID(ID).hasParents()
+        """
 
     def getIDsFilteredByName(self, name):
+        pass
+        """
         self.setFilter('name LIKE "%' + name + '%"')
         self.select()
         logging.debug("Found %d tags with name %s" % (self.rowCount(), name))
         IDs = [self.record(i).value("ID") for i in range(self.rowCount())]
         return IDs
+        """
 
     def getParentIDs(self, ID):
+        pass
+        """
         if self.tree.getElementByID(ID) is not None:
             return self.tree.getElementByID(ID).getParentIDs()
         else:
             return []
+        """
 
     def getParentIDsDownToRoot(self, ID):
+        pass
+        """
         allParentIDs = []
         if self.tree.getElementByID(ID) is not None:
             allParentIDs = self.tree.getElementByID(ID).getParentIDs()
             for parentID in allParentIDs:
                 allParentIDs.extend(self.getParentIDsDownToRoot(parentID))
         return allParentIDs
+        """
 
     def getParentsTags(self, tagID):
+        pass
+        """
         self.tree.getElementByID(tagID).getParentIDs()
+        """
 
     def updateTree(self, filterIDs=None):
+        pass
+        """
         self.tree = MultiParentTree()
 
         self.setFilter(getFilterFromIDs(filterIDs, "ID"))
@@ -193,3 +242,4 @@ class TagModel(QtSql.QSqlTableModel):
             parentID = self.tagParentsModel.record(i).value("parentTagID")
             childID = self.tagParentsModel.record(i).value("tagID")
             self.tree.setRelationship(parentID, childID)
+        """
