@@ -48,7 +48,7 @@ class NewKnowledgeDialog(QtGui.QDialog):
         tagIDs = []
         for i in range(self.ui.tagTreeWidget.topLevelItemCount()):
             rootItem = self.ui.tagTreeWidget.topLevelItem(i)
-            if rootItem.checkState(0) == QtCore.Qt.CheckState.Checked:
+            if rootItem.checkState(0) == 1:
                 tagIDs.append(int(rootItem.data(1, 0)))
             tagIDs.extend(self.getSelectedTagIDsFromChilds(rootItem))
         return tagIDs
@@ -57,7 +57,7 @@ class NewKnowledgeDialog(QtGui.QDialog):
         tagIDs = []
         for i in range(treeWidgetItem.childCount()):
             childItem = treeWidgetItem.child(i)
-            if childItem.checkState(0) == QtCore.Qt.CheckState.Checked:
+            if childItem.checkState(0) == 1:
                 tagIDs.append(int(childItem.data(1, 0)))
             tagIDs.extend(self.getSelectedTagIDsFromChilds(childItem))
         return tagIDs
