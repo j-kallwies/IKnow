@@ -48,8 +48,8 @@ class MainWindow(QtGui.QMainWindow):
         self.filterKnowledgeText = ""
 
         # Create menus
-        act = QtGui.QAction("Remove selected Tag", self, statusTip="Remove the selected Tag. The child Tags are not touched.", triggered=self.removeSelectedTag)
-        self.ui.tagTreeWidget.addAction(act)
+        removeTagAction = QtGui.QAction("Remove selected Tag", self, statusTip="Remove the selected Tag. The child Tags are not touched.", triggered=self.removeSelectedTag)
+        self.ui.tagTreeWidget.addAction(removeTagAction)
         self.ui.tagTreeWidget.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
 
         removeKnowledgeAction = QtGui.QAction("Remove selected knowledge", self, statusTip="Remove the selected piece of knowledge.", triggered=self.removeSelectedKnowledge)
