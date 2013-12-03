@@ -4,48 +4,6 @@ from PySide import QtCore
 
 from tagModel import getFilterFromIDs, TagModel
 
-"""
-class KnowledgeTagsModel(QtSql.QSqlTableModel):
-    def __init__(self, db):
-        super(KnowledgeTagsModel, self).__init__(None, db)
-        self.setTable("knowledge_tags")
-        self.select()
-        logging.debug("%d rows in KnowledgeTagsModel" % self.rowCount())
-
-    def getKnowledgeIDsFromTagIDs(self, tagIDs):
-        self.setFilter(getFilterFromIDs(tagIDs, "tag_ID"))
-        self.select()
-        knowledgeIDs = []
-        for i in range(self.rowCount()):
-            knowledgeIDs.append(self.record(i).value("knowledge_ID"))
-        return knowledgeIDs
-
-    def getTagIDsFromKnowledgeID(self, knowledgeID):
-        self.setFilter("knowledge_ID=%d" % knowledgeID)
-        self.select()
-        tagIDs = []
-        for i in range(self.rowCount()):
-            tagIDs.append(self.record(i).value("tag_ID"))
-        return tagIDs
-
-    def addTagForKnowledge(self, knowledgeID, tagID):
-        logging.debug("Adding tagID %d for knowledgeID %d" % (tagID, knowledgeID))
-        record = QtSql.QSqlRecord()
-        record.append(QtSql.QSqlField("ID"))
-        record.append(QtSql.QSqlField("knowledge_ID"))
-        record.append(QtSql.QSqlField("tag_ID"))
-        record.setValue(1, knowledgeID)
-        record.setValue(2, tagID)
-        return self.insertRecord(self.rowCount() - 1, record)
-
-    def removeTagFromKnowledge(self, knowledgeID, tagID):
-        self.setFilter("knowledge_ID=%d AND tag_ID=%d" % (knowledgeID, tagID))
-        self.select()
-        while self.rowCount() > 0:
-            logging.debug("Removing tagID %d from knowledgeID %d" % (tagID, knowledgeID))
-            self.removeRow(0)
-"""
-
 
 class KnowledgeModel(QtCore.QAbstractTableModel):
     def __init__(self, db):
@@ -152,18 +110,6 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         data["description"] = description
         data["tags"] = newTagIDs
         self.db.update(data)
-
-    def removeTagFromKnowledge(self, knowledgeID, tagID):
-        pass
-        """
-        self.knowledgeTagsModel.removeTagFromKnowledge(knowledgeID, tagID)
-        """
-
-    def addTagForKnowledge(self, knowledgeID, tagID):
-        pass
-        """
-        self.knowledgeTagsModel.addTagForKnowledge(knowledgeID, tagID)
-        """
 
     def getTagIDsFromKnowledgeID(self, knowledgeID):
         if "tags" in self.getDataDictByID(knowledgeID):
