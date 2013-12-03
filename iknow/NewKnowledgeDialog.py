@@ -91,11 +91,9 @@ class NewKnowledgeDialog(QtGui.QDialog):
             return
         title = self.ui.tagNameEdit.text()
         description = self.ui.plainTextEdit.toPlainText()
-        newKnowledgeID = self.knowledgeModel.addNewKnowledge(title, description)
         tagIDs = self.getSelectedTagIDs()
         logging.debug("getSelectedTagIDs()=%s" % str(tagIDs))
-        for tagID in tagIDs:
-            self.knowledgeModel.addTagForKnowledge(newKnowledgeID, tagID)
+        self.knowledgeModel.addNewKnowledge(title, description, tagIDs)
         self.close()
 
     def updateParentTagName(self, value):

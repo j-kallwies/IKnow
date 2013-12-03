@@ -142,8 +142,8 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         self.select()
         """
 
-    def addNewKnowledge(self, title, description):
-        newData = {"_t": "knowledge", "title": str(title), "description": str(description)}
+    def addNewKnowledge(self, title, description, tags):
+        newData = {"_t": "knowledge", "title": str(title), "description": str(description), "tags": []}
         res = self.db.insert(newData)
 
         self.update()
