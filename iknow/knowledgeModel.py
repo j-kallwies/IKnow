@@ -55,6 +55,8 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
 
         self.tagModel = TagModel(db)
 
+        self._filterByTagIDs = set()
+
         self.columns = ["_id", "_rev", "title", "description"]
 
         self.update()
@@ -67,7 +69,12 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         self._data = []
         for curr in self.db.all('id'):
             if curr["_t"] == "knowledge":
+                tags = set(curr["tags"])
                 print("***DATA***: %s" % str(curr))
+
+                if len(self._filterByTagIDs) > 0 and len(tags & self._filterByTagIDs) == 0:
+                    continue
+
                 self._data.append(curr)
 
         topLeft = self.index(0, 0);
@@ -114,33 +121,8 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
 
         return None
 
-    def setFilterByTagIDsAndText(self, tagIDs, filterText):
+    def setFilterByTagID(self, tagID):
         pass
-        """
-        if len(tagIDs) == 0:
-            filterByTags = "1"
-        else:
-            knowledgeIDs = self.knowledgeTagsModel.getKnowledgeIDsFromTagIDs(tagIDs)
-            logging.debug("getKnowledgeIDsFromTagIDs(%s)=%s" % (str(tagIDs), str(knowledgeIDs)))
-            if len(knowledgeIDs) == 0:
-                filterByTags = "0"
-            else:
-                filterByTags = getFilterFromIDs(knowledgeIDs, "ID")
-
-        if filterText is not None and filterText != "":
-            filterByText = '(title LIKE "%' + filterText + '%") OR (description LIKE "%' + filterText + '%")'
-        else:
-            filterByText = ''
-
-        logging.debug('filterByTags="%s"' % filterByTags)
-        logging.debug('filterByText="%s"' % filterByText)
-        if filterByText != "":
-            self.setFilter("(%s) AND (%s)" % (filterByTags, filterByText))
-        else:
-            self.setFilter(filterByTags)
-        logging.debug('knowledgeModel.filter = "%s"' % self.filter())
-        self.select()
-        """
 
     def addNewKnowledge(self, title, description, tags):
         newData = {"_t": "knowledge", "title": title, "description": description, "tags": tags}
@@ -150,35 +132,13 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
 
         return res['_id']
 
-    def updateKnowledge(self, row, title, description, newTagIDs):
-        pass
-        """
-        knowledgeID = self.record(row).value("ID")
-
-        self.setData(self.index(row, self.fieldIndex("title")), title)
-        self.setData(self.index(row, self.fieldIndex("description")), description)
-        self.submitAll()
-
-        logging.debug("updateKnowledge: knowledgeID=%d" % knowledgeID)
-
-        oldTagIds = set(self.getTagIDsFromKnowledgeID(knowledgeID))
-        newTagIDs = set(newTagIDs)
-
-        tagIDsToAdd = newTagIDs - oldTagIds
-        tagIDsToRemove = oldTagIds - newTagIDs
-
-        logging.debug("OldTagIDs: %s" % str(oldTagIds))
-        logging.debug("NewTagIDs: %s" % str(newTagIDs))
-
-        logging.debug("TagIDsToAdd: %s" % str(tagIDsToAdd))
-        logging.debug("TagIDsToRemove: %s" % str(tagIDsToRemove))
-
-        for tagID in tagIDsToAdd:
-            self.addTagForKnowledge(knowledgeID, tagID)
-
-        for tagID in tagIDsToRemove:
-            self.removeTagFromKnowledge(knowledgeID, tagID)
-        """
+    def updateKnowledge(self, ID, title, description, newTagIDs):
+        data = self.getDataDictByID(ID)
+        assert data is not None, 'The knowledge with the ID "%s" was not found!' % str(ID)
+        data["title"] = title
+        data["description"] = description
+        data["tags"] = newTagIDs
+        self.db.update(data)
 
     def removeTagFromKnowledge(self, knowledgeID, tagID):
         pass
@@ -199,14 +159,12 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
             return []
 
     def reload(self, currentTag=None, filterText=None):
-        pass
-        """
         if currentTag is not None:
             tagIDs = [currentTag]
             tagIDs.extend(self.tagModel.getAllChildIDs(currentTag))
         else:
             tagIDs = []
         logging.debug("reload(): tagIDs = %s" % str(tagIDs))
-        self.setFilterByTagIDsAndText(tagIDs, filterText)
-        self.select()
-        """
+        self._filterByTagIDs = set(tagIDs)
+        self._filterByText = filterText
+        self.update()

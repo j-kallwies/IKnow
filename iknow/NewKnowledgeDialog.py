@@ -73,7 +73,7 @@ class NewKnowledgeDialog(QtGui.QDialog):
         title = self.ui.tagNameEdit.text()
         description = self.ui.plainTextEdit.toPlainText()
         newTagIDs = self.getSelectedTagIDs()
-        self.knowledgeModel.updateKnowledge(self.editRow, title, description, newTagIDs)
+        self.knowledgeModel.updateKnowledge(self.knowledgeID, title, description, newTagIDs)
 
     def updateModelAndClose(self):
         self.updateModel()

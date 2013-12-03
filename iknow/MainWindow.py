@@ -121,7 +121,7 @@ class MainWindow(QtGui.QMainWindow):
         self.knowledgeModel.setFilterByTagID(self.currentTag)
 
     def tagChanged(self, current, previous):
-        self.currentTag = current.text(1)
+        self.currentTag = str(current.text(1))
         logging.debug("currentTag = %s", self.currentTag)
         self.reloadKnowledge()
 
