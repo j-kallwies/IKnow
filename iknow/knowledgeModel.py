@@ -90,6 +90,12 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         self.dataChanged.emit(topLeft, bottomRight) # TODO: Do it only if data really changed
         self.layoutChanged.emit() # TODO: Do it only if row- or column-count changed
 
+    def removeRows(self, rowsToRemove):
+        for row in rowsToRemove:
+            print("Delete(%s)" % self._data[row])
+            self.db.delete(self._data[row])
+        self.update()
+
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self._data)
 

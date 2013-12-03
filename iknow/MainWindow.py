@@ -52,6 +52,10 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.tagTreeWidget.addAction(act)
         self.ui.tagTreeWidget.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
 
+        removeKnowledgeAction = QtGui.QAction("Remove selected knowledge", self, statusTip="Remove the selected piece of knowledge.", triggered=self.removeSelectedKnowledge)
+        self.ui.knowledgeTableView.addAction(removeKnowledgeAction)
+        self.ui.knowledgeTableView.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
+
         # Connect signals and slots
         self.ui.tagTreeWidget.currentItemChanged.connect(self.tagChanged)
         self.ui.newTagButton.clicked.connect(self.showNewTagButtonDialog)
@@ -69,6 +73,12 @@ class MainWindow(QtGui.QMainWindow):
         logging.debug("Remove selected Tag (ID=%s)." % IDtoRemove)
         self.tagModel.removeTag(IDtoRemove)
         self.updateTagWidget()
+
+    def removeSelectedKnowledge(self):
+        print("removeSelectedKnowledge")
+        rowsToRemove = [index.row() for index in self.ui.knowledgeTableView.selectionModel().selectedRows()]
+        print("Delete rows: %s" % rowsToRemove)
+        self.knowledgeModel.removeRows(rowsToRemove)
 
     def updateTagWidget(self):
         self.tagModel.updateTree()
