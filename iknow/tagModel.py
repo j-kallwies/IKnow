@@ -60,14 +60,10 @@ class TagModel(QtCore.QAbstractTableModel):
         return res['_id']
 
     def removeTag(self, ID):
-        pass
-        """
-        self.setFilter("ID=%d" % ID)
-        self.select()
-        logging.debug("removeTag: self.rowCount()=%d" % self.rowCount())
-        if self.rowCount() == 1:
-            self.removeRow(0)
-        """
+        print("removeTag(%s)" % ID)
+        for curr in self.db.all('id'):
+            if curr["_id"] == ID:
+                self.db.delete(curr)
 
     def getTagNameFromID(self, ID):
         elem = self.tree.getElementByID(ID)
