@@ -115,6 +115,7 @@ class MainWindow(QtGui.QMainWindow):
         logging.debug("Show NewTagDialog")
         newTagDlg = NewTagDialog(self, self.tagModel, self.tagModel.tagParentsModel, parentID=self.currentTag)
         newTagDlg.exec_()
+        # TODO: Update only if tags really changed!
         self.updateTagWidget()
 
     def showNewKnowledgeDialog(self):
