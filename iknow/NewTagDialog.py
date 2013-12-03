@@ -23,8 +23,11 @@ class NewTagDialog(QtGui.QDialog):
         self.updateParentTagName()
 
         if parentID is not None:
-            self.ui.parentTagComboBox.setValue(parentID)
-            self.updateParentTagName(parentID)
+            for i in range(self.ui.parentTagComboBox.count()):
+                self.ui.parentTagComboBox.setCurrentIndex(i)
+                if str(self.ui.parentTagComboBox.currentText()) == parentID:
+                    break
+            self.updateParentTagName()
             self.addTag()
 
         self.setWindowTitle("Add new Tag")
