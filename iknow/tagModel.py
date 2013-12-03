@@ -78,7 +78,7 @@ class TagModel(QtCore.QAbstractTableModel):
 
     def getChildIDs(self, ID, filterIDs=None):
         #TODO: Implement filter
-        logging.debug("getChildIDs(%d)" % ID)
+        logging.debug("getChildIDs(%s)" % ID)
         if not self.tree.hasID(ID):
             return []
         return self.tree.getElementByID(ID).getChildIDs()
