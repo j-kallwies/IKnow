@@ -1,6 +1,7 @@
 import logging
 
 from PySide import QtCore
+from PySide import QtGui
 
 from tagModel import getFilterFromIDs, TagModel
 
@@ -29,7 +30,7 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         for curr in self.db.all('id'):
             if curr["_t"] == "knowledge":
                 tags = set(curr["tags"])
-                print("***DATA***: %s" % str(curr))
+                #print("***DATA***: %s" % str(curr))
 
                 # Filter by tags
                 if len(self._filterByTagIDs) > 0 and len(tags & self._filterByTagIDs) == 0:
@@ -95,21 +96,48 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
     def setFilterByTagID(self, tagID):
         pass
 
-    def addNewKnowledge(self, title, description, tags):
+    def addNewKnowledge(self, title, description, tags, imagePath=None):
         newData = {"_t": "knowledge", "title": title, "description": description, "tags": tags}
+
+        if imagePath is not None:
+            newData["image"] = open(imagePath, "rb").read()
+
         res = self.db.insert(newData)
 
         self.update()
 
         return res['_id']
 
-    def updateKnowledge(self, ID, title, description, newTagIDs):
+    """
+    imagePath = None does not touch the image
+              = "" removes the image
+    """
+    def updateKnowledge(self, ID, title, description, newTagIDs, imagePath=None):
         data = self.getDataDictByID(ID)
         assert data is not None, 'The knowledge with the ID "%s" was not found!' % str(ID)
         data["title"] = title
         data["description"] = description
         data["tags"] = newTagIDs
+
+        if imagePath is not None:
+            if imagePath == "":
+                data["image"] = ""
+            else:
+                data["image"] = open(imagePath, "rb").read()
+
         self.db.update(data)
+
+    def getImage(self, ID):
+        tempFilename = 'image'
+        data = self.getDataDictByID(ID)
+        if "image" not in data:
+            return None
+        else:
+            # TODO: Do not save as a file!
+            with open(tempFilename, 'wb') as imageFile:
+                imageFile.write(data["image"])
+
+            return QtGui.QPixmap(tempFilename)
 
     def getTagIDsFromKnowledgeID(self, knowledgeID):
         if "tags" in self.getDataDictByID(knowledgeID):
