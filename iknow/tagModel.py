@@ -144,14 +144,12 @@ class TagModel(QtCore.QAbstractTableModel):
         return self.tree.getElementByID(ID).hasParents()
 
     def getIDsFilteredByName(self, name):
-        pass
-        """
-        self.setFilter('name LIKE "%' + name + '%"')
-        self.select()
-        logging.debug("Found %d tags with name %s" % (self.rowCount(), name))
-        IDs = [self.record(i).value("ID") for i in range(self.rowCount())]
+        IDs = []
+        for curr in self.db.all('id'):
+            if curr["_t"] == "tag":
+                if name.lower() in curr["name"].lower():
+                    IDs.append(curr["_id"])
         return IDs
-        """
 
     def getParentIDs(self, ID):
         if self.tree.getElementByID(ID) is not None:
@@ -173,14 +171,17 @@ class TagModel(QtCore.QAbstractTableModel):
     def updateTree(self, filterIDs=None):
         self.tree = MultiParentTree()
 
-        #TODO: Implement filter!
-
         for curr in self.db.all('id'):
             if curr["_t"] == "tag":
                 ID = curr["_id"]
                 tag = curr["name"]
                 logging.debug("ID=%s" % str(ID))
                 logging.debug("tag=%s" % tag)
+
+                if filterIDs is not None:
+                    if ID not in filterIDs:
+                        continue
+
                 self.tree.insertElement(ID, tag)
 
         for curr in self.db.all('id'):
