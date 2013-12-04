@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 #import CodernityDB
 from CodernityDB.database import Database
 from CodernityDB.hash_index import HashIndex
@@ -25,7 +27,10 @@ class TagIndex(HashIndex):
 
 
 class DatabaseConnection:
-    def __init__(self, path="./noSQLDB"):
+    def __init__(self, path=os.getenv("HOME")+"/.iknow/DB"):
+        if not os.path.exists(path):
+            os.makedirs(path)
+
         self.db = Database(path)
 
         tagsIndex = TagIndex(self.db.path, 'tags')
