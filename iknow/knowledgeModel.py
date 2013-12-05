@@ -3,16 +3,14 @@ import logging
 from PySide import QtCore
 from PySide import QtGui
 
-from tagModel import getFilterFromIDs, TagModel
-
 
 class KnowledgeModel(QtCore.QAbstractTableModel):
-    def __init__(self, db):
+    def __init__(self, db, tagModel):
         super(KnowledgeModel, self).__init__()
 
         self.db = db
 
-        self.tagModel = TagModel(db)
+        self.tagModel = tagModel
 
         self._filterByTagIDs = set()
         self._filterByText = ""
