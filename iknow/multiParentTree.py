@@ -46,6 +46,16 @@ class TreeElement:
                 return True
         return False
 
+    def dumpToString(self, level):
+        try:
+            dataText = str(self.data)
+        except:
+            dataText = "???"
+        res = "\n" + " "*level + "* %s: %s" % (self.id, dataText)
+        for child in self.childs:
+            res += child.dumpToString(level + 1)
+        return res
+
 
 class MultiParentTree:
     def __init__(self):
@@ -99,3 +109,9 @@ class MultiParentTree:
 
     def hasID(self, ID):
         return ID in self._elements
+
+    def __str__(self):
+        res = "* ROOT"
+        for elem in self.getRootElements():
+            res += elem.dumpToString(1)
+        return res

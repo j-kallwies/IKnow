@@ -80,8 +80,11 @@ class TagModel(QtCore.QAbstractTableModel):
         #TODO: Implement filter
         logging.debug("getChildIDs(%s)" % ID)
         if not self.tree.hasID(ID):
+            logging.debug("getChildIDs: Tree does not have ID %s" % ID)
             return []
-        return self.tree.getElementByID(ID).getChildIDs()
+        childIDs = self.tree.getElementByID(ID).getChildIDs()
+        logging.debug("getChildIDs: Found child IDs: %s" % childIDs)
+        return childIDs
 
     def getAllChildIDs(self, ID):
         childIDs = self.getChildIDs(ID)
@@ -190,3 +193,7 @@ class TagModel(QtCore.QAbstractTableModel):
                 parentIDs = curr["parents"]
                 for parentID in parentIDs:
                     self.tree.setRelationship(parentID, childID)
+
+        logging.debug("************ DUMP TREE ************")
+        logging.debug("\n" + str(self.tree))
+        logging.debug("***********************************")
