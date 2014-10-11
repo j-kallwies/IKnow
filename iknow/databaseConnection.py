@@ -33,10 +33,6 @@ class DatabaseConnection:
 
         self.db = Database(path)
 
-        tagsIndex = TagIndex(self.db.path, 'tags')
-
-        print(tagsIndex)
-
         if self.db.exists():
             self.db.open()
             self.db.reindex()
