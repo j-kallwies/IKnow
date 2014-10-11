@@ -22,6 +22,9 @@ class DatabaseConnection:
             if not os.path.exists(fullSubFolderPath):
                 os.makedirs(fullSubFolderPath)
 
+        self.updateTags()
+        self.updateKnowledge()
+
     def tagsPath(self):
         return self._baseDBPath + self._tagsFolderName + '/'
 
@@ -32,11 +35,17 @@ class DatabaseConnection:
         folder = self._baseDBPath + subFolder
         return [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
 
-    def listAllTags(self):
-        return self.listAll(self._tagsFolderName)
+    def allTags(self):
+        return self._allTags
 
-    def listAllKnowledge(self):
-        return self.listAll(self._knowledgeFolderName)
+    def allKnowledge(self):
+        return self._allKnowledge
+
+    def updateTags(self):
+        self._allTags = self.listAll(self._tagsFolderName)
+
+    def updateKnowledge(self):
+        self._allKnowledge = self.listAll(self._knowledgeFolderName)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

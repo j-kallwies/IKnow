@@ -1,12 +1,14 @@
 import logging
-import os
+import shutil
+from hashlib import sha1
 import json
+import time
+import os
 
 from PySide import QtGui
 from PySide import QtCore
 
 from multiParentTree import MultiParentTree
-from hashlib import sha1
 
 
 def getFilterFromIDs(filterIDs, field):
@@ -56,16 +58,26 @@ class TagModel(QtCore.QAbstractTableModel):
         return 0
 
     def addTag(self, name, parents):
-        newData = {"_t": "tag", "name": name, "parents": parents}
-        res = self.db.insert(newData)
+        newData = {"name": name, "parents": parents}
 
-        return res['_id']
+        ID = sha1(name + str(time.time())).hexdigest()
+
+        current_tag_folder = self.db.tagsPath() + ID
+
+        os.makedirs(current_tag_folder)
+
+        tagfile = open(current_tag_folder + '/tag', 'w')
+        tagfile.write(json.dumps(newData) + "\n")
+
+        self.db.updateTags()
+
+        return ID
 
     def removeTag(self, ID):
         print("removeTag(%s)" % ID)
-        for curr in self.db.all('id'):
-            if curr["_id"] == ID:
-                self.db.delete(curr)
+        shutil.rmtree(self.db.tagsPath() + ID)
+
+        self.db.updateTags()
 
     def getTagNameFromID(self, ID):
         elem = self.tree.getElementByID(ID)
@@ -73,7 +85,7 @@ class TagModel(QtCore.QAbstractTableModel):
             return elem.data
 
     def getAllIDs(self):
-        return [curr["_id"] for curr in self.db.all('id') if curr["_t"] == "tag"]
+        return self.db.allTags()
 
     def hasID(self, ID):
         return self.tree.hasID(ID)
@@ -150,10 +162,10 @@ class TagModel(QtCore.QAbstractTableModel):
 
     def getIDsFilteredByName(self, name):
         IDs = []
-        for curr in self.db.all('id'):
-            if curr["_t"] == "tag":
-                if name.lower() in curr["name"].lower():
-                    IDs.append(curr["_id"])
+        for ID in self.db.allTags():
+            curr = json.loads(open(self.db.tagsPath() + ID + '/tag').read())
+            if name.lower() in curr["name"].lower():
+                IDs.append(ID)
         return IDs
 
     def getParentIDs(self, ID):
@@ -178,7 +190,7 @@ class TagModel(QtCore.QAbstractTableModel):
 
         ID_to_parents = {}
 
-        for ID in self.db.listAllTags():
+        for ID in self.db.allTags():
             tag_data = json.loads(open(self.db.tagsPath() + ID + '/tag').read())
             tag = tag_data['name']
 

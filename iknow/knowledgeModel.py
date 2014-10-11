@@ -1,6 +1,8 @@
 import logging
+import time
 import os
 import json
+import shutil
 
 from PySide import QtCore
 from PySide import QtGui
@@ -28,14 +30,14 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         print("update()")
 
         self._data = []
-        for ID in self.db.listAllKnowledge():
+        for ID in self.db.allKnowledge():
             info_data = json.loads(open(self.db.knowledgePath() + ID + '/info').read())
             tags = set(info_data['tags'])
 
             curr = info_data
             curr['_id'] = ID
             curr['description'] = open(self.db.knowledgePath() + ID + '/knowledge').read()
-            print("***DATA***: %s" % str(curr))
+            #print("***DATA***: %s" % str(curr))
 
             # Filter by tags
             if len(self._filterByTagIDs) > 0 and len(tags & self._filterByTagIDs) == 0:
@@ -57,7 +59,11 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
     def removeRows(self, rowsToRemove):
         for row in rowsToRemove:
             print("Delete(%s)" % self._data[row])
-            self.db.delete(self._data[row])
+            ID_to_delete = self._data[row]['_id']
+            print("Delete %s" % ID_to_delete)
+            shutil.rmtree(self.db.knowledgePath() + ID_to_delete)
+
+        self.db.updateKnowledge()
         self.update()
 
     def rowCount(self, parent=QtCore.QModelIndex()):
@@ -102,16 +108,29 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         pass
 
     def addNewKnowledge(self, title, description, tags, imagePath=None):
-        newData = {"_t": "knowledge", "title": title, "description": description, "tags": tags}
+        newData = {"type": "BasicKnowledge", "title": title, "tags": tags}
 
-        if imagePath is not None:
-            newData["image"] = open(imagePath, "rb").read()
+        # TODO: Implement image-saving for file-DB
+        #if imagePath is not None:
+        #    newData["image"] = open(imagePath, "rb").read()
 
-        res = self.db.insert(newData)
+        ID = sha1(str(newData) + str(time.time())).hexdigest()
+
+        current_knowledge_folder = self.db.knowledgePath() + ID
+
+        os.makedirs(current_knowledge_folder)
+
+        infofile = open(current_knowledge_folder + '/info', 'w')
+        infofile.write(json.dumps(newData) + "\n")
+        infofile.close()
+
+        open(current_knowledge_folder + '/knowledge', 'w').write(description)
+
+        self.db.updateKnowledge()
 
         self.update()
 
-        return res['_id']
+        return ID
 
     """
     imagePath = None does not touch the image
@@ -130,7 +149,12 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
             else:
                 data["image"] = open(imagePath, "rb").read()
 
-        self.db.update(data)
+        # TODO: Move this to a class
+        data_for_json = data.copy()
+        data_for_json.pop('_id')
+        info_data = json.dumps(data_for_json)
+
+        open(self.db.knowledgePath() + ID + '/info','w').write(info_data)
 
     def getImage(self, ID):
         tempFilename = 'image'
