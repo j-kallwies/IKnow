@@ -1,53 +1,42 @@
 # -*- coding: utf-8 -*-
 
 import os
-
-#import CodernityDB
-from CodernityDB.database import Database
-from CodernityDB.hash_index import HashIndex
 import logging
-
-from hashlib import md5
-
-class TagIndex(HashIndex):
-
-    def __init__(self, *args, **kwargs):
-        kwargs['key_format'] = '16s'
-        super(TagIndex, self).__init__(*args, **kwargs)
-
-    def make_key_value(self, data):
-        if data['_t'] == 'tag':
-            tagName = data['name']
-            # if not isinstance(login, basestring):
-            #     login = str(login)
-            return md5(tagName).digest(), {'name': data['name'], 'parents': data['parents']}
-
-    def make_key(self, key):
-        return md5(key).digest()
-
 
 class DatabaseConnection:
     def __init__(self, path=os.getenv("HOME")+"/.iknow/DB"):
+        self._tagsFolderName = 'tags'
+        self._knowledgeFolderName = 'knowledge'
+
+        self._baseDBPath = path
+        if self._baseDBPath[-1] != '/':
+            self._baseDBPath += '/'
+
+        self._databaseSubFolders = [self._tagsFolderName, 'knowledge']
+
         if not os.path.exists(path):
             os.makedirs(path)
 
-        self.db = Database(path)
+        for subFolder in self._databaseSubFolders:
+            fullSubFolderPath = path + '/' + subFolder
+            if not os.path.exists(fullSubFolderPath):
+                os.makedirs(fullSubFolderPath)
 
-        if self.db.exists():
-            self.db.open()
-            self.db.reindex()
-        else:
-            self.db.create()
-            #self.db.add_index(tagsIndex)
+    def tagsPath(self):
+        return self._baseDBPath + self._tagsFolderName + '/'
 
-        """
-        print("********************************")
-        print("FULL DB CONTENT:")
-        print("********************************")
-        for curr in self.db.all('id'):
-            print curr
-        print("********************************")
-        """
+    def knowledgePath(self):
+        return self._baseDBPath + self._knowledgeFolderName + '/'
+
+    def listAll(self, subFolder):
+        folder = self._baseDBPath + subFolder
+        return [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
+
+    def listAllTags(self):
+        return self.listAll(self._tagsFolderName)
+
+    def listAllKnowledge(self):
+        return self.listAll(self._knowledgeFolderName)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

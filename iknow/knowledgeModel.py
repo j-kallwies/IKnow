@@ -17,7 +17,7 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         self._filterByTagIDs = set()
         self._filterByText = ""
 
-        self.columns = ["_id", "_rev", "title", "description"]
+        self.columns = ["_id", "title", "description"]
 
         self.update()
 
@@ -27,59 +27,26 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
     def update(self):
         print("update()")
 
-        db_folder = "/home/jaka/.iknow/DB/"
-        knowledge_folder = db_folder + "knowledge/"
-
         self._data = []
-        for curr in self.db.all('id'):
-            if curr["_t"] == "knowledge":
-                tags = set(curr["tags"])
+        for ID in self.db.listAllKnowledge():
+            info_data = json.loads(open(self.db.knowledgePath() + ID + '/info').read())
+            tags = set(info_data['tags'])
 
-                new_id_tags = []
-                for tag in tags:
-                    print('tag-ID='+str(tag))
-                    tag_name = self.tagModel.getTagNameFromID(tag)
-                    print(tag_name)
-                    if tag_name is not None:
-                        new_id_tags.append(sha1(tag.encode('utf-8')).hexdigest())
+            curr = info_data
+            curr['_id'] = ID
+            curr['description'] = open(self.db.knowledgePath() + ID + '/knowledge').read()
+            print("***DATA***: %s" % str(curr))
 
-                #print("***DATA***: %s" % str(curr))
+            # Filter by tags
+            if len(self._filterByTagIDs) > 0 and len(tags & self._filterByTagIDs) == 0:
+                continue
 
-                # Save to new Database-Structure
-                new_knowledge_id = sha1(str(curr)).hexdigest()
-                print('new_knowledge_id='+new_knowledge_id)
+            # Filter by text
+            # TODO: Always accepts "{" and "}" => Fail
+            if self._filterByText.lower() not in str(curr).lower():
+                continue
 
-                current_knowledge_folder = knowledge_folder + new_knowledge_id + '/'
-
-                if not os.path.exists(current_knowledge_folder):
-                    os.makedirs(current_knowledge_folder)
-
-                infofile = open(current_knowledge_folder+'info', 'w')
-                info_data = {'type': 'BasicKnowledge', 'title': curr["title"].encode('utf-8'), 'tags': new_id_tags}
-                infofile.write(json.dumps(info_data) + "\n")
-                infofile.close()
-
-                knowledgefile = open(current_knowledge_folder+'knowledge', 'w')
-                knowledgefile.write(curr["description"].encode('utf-8'))
-                knowledgefile.close()
-
-                tempFilename = current_knowledge_folder+'image.png'
-                if "image" in curr:
-                    # TODO: Do not save as a file!
-                    print('FOUND AN IMAGE! => Save it to ' + tempFilename)
-                    with open(tempFilename, 'wb') as imageFile:
-                        imageFile.write(curr["image"])
-
-                # Filter by tags
-                if len(self._filterByTagIDs) > 0 and len(tags & self._filterByTagIDs) == 0:
-                    continue
-
-                # Filter by text
-                # TODO: Always accepts "{" and "}" => Fail
-                if self._filterByText.lower() not in str(curr).lower():
-                    continue
-
-                self._data.append(curr)
+            self._data.append(curr)
 
         topLeft = self.index(0, 0);
         bottomRight = self.index(self.rowCount() - 1, self.columnCount() - 1)

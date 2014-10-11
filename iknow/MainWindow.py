@@ -25,8 +25,8 @@ class MainWindow(QtGui.QMainWindow):
         self.dbConnection = DatabaseConnection()
 
         # Create Models
-        self.tagModel = TagModel(self.dbConnection.db)
-        self.knowledgeModel = KnowledgeModel(self.dbConnection.db, self.tagModel)
+        self.tagModel = TagModel(self.dbConnection)
+        self.knowledgeModel = KnowledgeModel(self.dbConnection, self.tagModel)
 
         print("%d rows!" % self.knowledgeModel.rowCount())
 
