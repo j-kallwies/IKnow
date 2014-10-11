@@ -5,6 +5,9 @@ from PySide import QtGui
 from PySide import QtCore
 
 from multiParentTree import MultiParentTree
+from hashlib import sha1
+import os
+import json
 
 
 def getFilterFromIDs(filterIDs, field):
@@ -174,12 +177,17 @@ class TagModel(QtCore.QAbstractTableModel):
     def updateTree(self, filterIDs=None):
         self.tree = MultiParentTree()
 
+        db_folder = "/home/jaka/.iknow/DB/"
+        tags_folder = db_folder + "tags/"
+
         for curr in self.db.all('id'):
             if curr["_t"] == "tag":
+                print("curr="+str(curr))
                 ID = curr["_id"]
                 tag = curr["name"]
-                logging.debug("ID=%s" % str(ID))
-                logging.debug("tag=%s" % tag)
+
+                #logging.debug("ID=%s" % str(ID))
+                #logging.debug("tag=%s" % tag)
 
                 if filterIDs is not None:
                     if ID not in filterIDs:
@@ -191,9 +199,26 @@ class TagModel(QtCore.QAbstractTableModel):
             if curr["_t"] == "tag":
                 childID = curr["_id"]
                 parentIDs = curr["parents"]
+                parent_new_IDs = []
                 for parentID in parentIDs:
+                    parent_new_IDs.append(sha1(parentID.encode('utf-8')).hexdigest())
                     self.tree.setRelationship(parentID, childID)
 
-        logging.debug("************ DUMP TREE ************")
-        logging.debug("\n" + str(self.tree))
-        logging.debug("***********************************")
+                # Save to new Database-Structure
+                tag = curr["name"]
+                new_tag_id = sha1(childID.encode('utf-8')).hexdigest()
+                print('new_tag_id='+new_tag_id)
+
+                current_tag_folder = tags_folder + new_tag_id + '/'
+
+                if not os.path.exists(current_tag_folder):
+                    os.makedirs(current_tag_folder)
+
+                tagfile = open(current_tag_folder+'tag', 'w')
+                tag_data = {'name': tag.encode('utf-8'), 'parents': parent_new_IDs}
+                tagfile.write(json.dumps(tag_data) + "\n")
+                tagfile.close()
+
+        #logging.debug("************ DUMP TREE ************")
+        #logging.debug("\n" + str(self.tree))
+        #logging.debug("***********************************")
