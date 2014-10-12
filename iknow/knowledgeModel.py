@@ -36,7 +36,7 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
 
             curr = info_data
             curr['_id'] = ID
-            curr['description'] = open(self.db.knowledgePath() + ID + '/knowledge').read()
+            curr['description'] = open(self.db.knowledgePath() + ID + '/knowledge').read().decode('utf-8')
             #print("***DATA***: %s" % str(curr))
 
             # Filter by tags
