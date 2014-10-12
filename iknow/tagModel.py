@@ -60,7 +60,7 @@ class TagModel(QtCore.QAbstractTableModel):
     def addTag(self, name, parents):
         newData = {"name": name, "parents": parents}
 
-        ID = sha1(name + str(time.time())).hexdigest()
+        ID = sha1(name.encode('utf-8') + str(time.time())).hexdigest()
 
         current_tag_folder = self.db.tagsPath() + ID
 

@@ -124,7 +124,7 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         infofile.write(json.dumps(newData) + "\n")
         infofile.close()
 
-        open(current_knowledge_folder + '/knowledge', 'w').write(description)
+        open(current_knowledge_folder + '/knowledge', 'w').write(description.encode('utf-8'))
 
         self.db.updateKnowledge()
 
