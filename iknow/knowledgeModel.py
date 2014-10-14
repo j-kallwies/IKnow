@@ -154,7 +154,8 @@ class KnowledgeModel(QtCore.QAbstractTableModel):
         data_for_json.pop('_id')
         info_data = json.dumps(data_for_json)
 
-        open(self.db.knowledgePath() + ID + '/info','w').write(info_data)
+        open(self.db.knowledgePath() + ID + '/info','w').write(info_data.encode('utf-8'))
+        open(self.db.knowledgePath() + ID + '/knowledge','w').write(description.encode('utf-8'))
 
     def getImage(self, ID):
         tempFilename = 'image'
